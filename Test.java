@@ -1,18 +1,24 @@
 package TicyTacyToe;
+import java.util.Scanner;
 
 public class Test {
     public static void main(String[] args) {
         Intro();
+
         String[][] board = createGrid();
 
+        Scanner userStart = new Scanner(System.in);
+
+        userStart.nextLine();
+
+
+        System.out.println("Here's the playboard");
         for (String[] row : board) {
             for (String cell : row) {
                 System.out.print("[" + cell + "]");
             }
             System.out.println();
         }
-
-        System.out.println(board);
     }
 
 
@@ -31,8 +37,6 @@ public class Test {
                 {" ", " ", " "},
                 {" ", " ", " "}
         };
-        System.out.println("here's the playboard");
-
         return board;
     }
 
