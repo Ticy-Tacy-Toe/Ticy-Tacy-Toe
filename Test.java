@@ -25,8 +25,15 @@ public class Test {
                 System.out.println();
             }
             System.out.println("Enter your move:");
-            System.out.println("For example, 2, 5:");
+            System.out.println("For example: 0, 2:");
             String input = userStart.nextLine();
+
+
+            int input1 = Character.getNumericValue(input.charAt(0));
+            int input2 = Character.getNumericValue(input.charAt(2));
+
+            board[input1][input2] = "X";
+
         }
     }
 
