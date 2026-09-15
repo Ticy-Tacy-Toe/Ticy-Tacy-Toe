@@ -51,19 +51,10 @@ public class Test {
 
     public static int player(int turn) {
         if (turn == 1) {
-            return turn = 2;
+            return 2;
         }
         else {
-            return turn = 1;
+            return 1;
         }
-    }
-
-    public static void userInput() {
-        System.out.println("which row?");
-        Scanner choiceRow = new Scanner(System.in);
-        System.out.println("which column?");
-        Scanner choiceColumn = new Scanner(System.in);
-
-
     }
 }
