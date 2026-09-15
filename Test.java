@@ -14,13 +14,19 @@ public class Test {
         int player = 2;
 
         player(player);
-        System.out.println(player);
-        System.out.println("Here's the playboard");
-        for (String[] row : board) {
-            for (String cell : row) {
-                System.out.print("[" + cell + "]");
+
+        boolean end = false;
+        while (!end) {
+
+            for (String[] row : board) {
+                for (String cell : row) {
+                    System.out.print("[" + cell + "]");
+                }
+                System.out.println();
             }
-            System.out.println();
+            System.out.println("Enter your move:");
+            System.out.println("For example, 2, 5:");
+            String input = userStart.nextLine();
         }
     }
 
@@ -52,4 +58,12 @@ public class Test {
         }
     }
 
+    public static void userInput() {
+        System.out.println("which row?");
+        Scanner choiceRow = new Scanner(System.in);
+        System.out.println("which column?");
+        Scanner choiceColumn = new Scanner(System.in);
+
+
+    }
 }
