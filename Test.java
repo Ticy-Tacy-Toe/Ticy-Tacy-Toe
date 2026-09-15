@@ -24,9 +24,9 @@ public class Test {
                 }
                 System.out.println();
             }
-            System.out.println("Enter your move:");
-            System.out.println("For example, 2, 5:");
-            String input = userStart.nextLine();
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter your move (row, col):");
+            String input = scanner.nextLine();
         }
     }
 
