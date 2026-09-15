@@ -14,8 +14,6 @@ public class Test {
         int player = 2;
 
         player(player);
-        char symbol = chooseSymbol(userStart);
-        System.out.println(symbol);
         System.out.println(player);
         System.out.println("Here's the playboard");
         for (String[] row : board) {
@@ -53,22 +51,5 @@ public class Test {
             return turn = 1;
         }
     }
-    public static char chooseSymbol(Scanner scanner){
-        System.out.println("Choose X or O:");
-        String input = scanner.nextLine();
-        input = input.toUpperCase();
-        char symbol = input.charAt(0);
-        while (symbol != 'X' && symbol != 'O') {
-            System.out.println("Invalid choice. Choose X or O:");
-            input = scanner.nextLine();
-            input = input.toUpperCase();
-            symbol = input.charAt(0);
-            System.out.println(symbol);
-        }
-
-        return symbol;
-    }
-
-
 
 }
