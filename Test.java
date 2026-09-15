@@ -13,16 +13,20 @@ public class Test {
 
         int player = 2;
 
-        char symbol = chooseSymbol(userStart);
-        System.out.println(symbol);
         player(player);
-        System.out.println(player);
-        System.out.println("Here's the playboard");
-        for (String[] row : board) {
-            for (String cell : row) {
-                System.out.print("[" + cell + "]");
+
+        boolean end = false;
+        while (!end) {
+
+            for (String[] row : board) {
+                for (String cell : row) {
+                    System.out.print("[" + cell + "]");
+                }
+                System.out.println();
             }
-            System.out.println();
+            System.out.println("Enter your move:");
+            System.out.println("For example, 2, 5:");
+            String input = userStart.nextLine();
         }
     }
 
@@ -47,32 +51,10 @@ public class Test {
 
     public static int player(int turn) {
         if (turn == 1) {
-            return turn = 2;
+            return 2;
         }
         else {
-            return turn = 1;
+            return 1;
         }
     }
-    public static char chooseSymbol(Scanner scanner) {
-        System.out.println("Choose X or O:");
-
-        String input = scanner.nextLine();
-        input = input.toUpperCase();
-
-        char symbol = input.charAt(0);
-
-        while (symbol != 'X' && symbol != 'O') {
-            System.out.println("Invalid choice. Choose X or O:");
-
-            input = scanner.nextLine();
-            input = input.toUpperCase();
-
-            symbol = input.charAt(0);
-
-            System.out.println(symbol);
-        }
-
-        return symbol;
-    }
-
 }
