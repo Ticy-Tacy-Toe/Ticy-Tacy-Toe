@@ -11,7 +11,10 @@ public class Test {
 
         userStart.nextLine();
 
+        int player = 2;
 
+        player(player);
+        System.out.println(player);
         System.out.println("Here's the playboard");
         for (String[] row : board) {
             for (String cell : row) {
@@ -40,5 +43,13 @@ public class Test {
         return board;
     }
 
+    public static int player(int turn) {
+        if (turn == 1) {
+            return turn = 2;
+        }
+        else {
+            return turn = 1;
+        }
+    }
 
 }
