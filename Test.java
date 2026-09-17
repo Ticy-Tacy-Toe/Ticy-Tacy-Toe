@@ -89,6 +89,7 @@ public class Test {
                     char verder = doorspelen.charAt(0);
                     if (verder == 'Y') {
                         System.out.println("user pressed Yes");
+                        clearBoard(board);
 
                     } else {
 
@@ -233,7 +234,7 @@ public class Test {
         int n = board.length;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                board[i][j] = " "; 
+                board[i][j] = " ";
             }
         }
         return board;
