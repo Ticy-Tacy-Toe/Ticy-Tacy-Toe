@@ -45,6 +45,7 @@ public class Test {
 
                 if (canMoveAI) {
                     board[input1][input2] = "O";
+                    checkWin(board);
                     player = switch_player(player);
                 } else {
                     continue;
@@ -79,22 +80,15 @@ public class Test {
                     System.out.println("invalid move, please try again");
                 }
                 if (checkWin(board)) {
-                    System.out.println("Je hebt gewonnen!");
-                    System.out.println("Wil je nog een keer spelen Y/N");
-                    Scanner scanner = new Scanner(System.in);
-                    String doorspelen = scanner.nextLine();
-                    doorspelen = doorspelen.toUpperCase();
-                    System.out.println(doorspelen);
-
-                    char verder = doorspelen.charAt(0);
-                    if (verder == 'Y') {
-                        System.out.println("user pressed Yes");
-                        clearBoard(board);
-
-                    } else {
-
-                        System.out.println("ending ");
+                    boolean test = endingScreen(player, board);
+                    System.out.println(test + "Bool");
+                    if (test == true){
+                        System.out.println("end true");
                         end = true;
+                    }
+                    else {
+                        System.out.println("Clearboard");
+                        clearBoard(board);
                     }
                 }
             }
@@ -243,6 +237,31 @@ public class Test {
     public static boolean aisChoice() {
         System.out.println(Arrays.toString(AI.aiChoice()));
         return false;
+    }
+
+    public static boolean endingScreen(int winner, String[][] board) {
+        if (winner == 1) {
+            System.out.println("Je hebt gewonnen!fafdasf");
+        }
+
+        if (winner == 2) {
+            System.out.println("Je hebt verloren :(");
+        }
+
+        System.out.println("Wil je nog een keer spelen Y/N");
+
+        Scanner scanner = new Scanner(System.in);
+        String doorspelen = scanner.nextLine().toUpperCase();
+
+        char verder = doorspelen.charAt(0);
+
+        if (verder == 'Y') {
+            System.out.println("user pressed Yes");
+            return false;
+        } else {
+            System.out.println("ending");
+            return true;
+        }
     }
 
 }
