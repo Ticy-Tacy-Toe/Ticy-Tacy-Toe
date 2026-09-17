@@ -33,52 +33,70 @@ public class Test {
                 }
                 System.out.println();
             }
-            aisChoice();
-            System.out.println("Enter your move:");
-            System.out.println("For example: 1 to 3, \n" +
-                    "first is for the row, the second is column \n" +
-                    "be sure to put a , in between the numbers"); // can be in 1 print
-            String input = Scanner.nextLine();
 
-            String[] coordinates = input.split(",");
+            if (player == 1) {
 
-            int input1 = Integer.parseInt(coordinates[0].trim());
-            int input2 = Integer.parseInt(coordinates[1].trim());
+                int[] aiMove = AI.aiChoice();
 
-            boolean canMove = Input_index(input1, input2, board);
+                int input1 = aiMove[0];
+                int input2 = aiMove[1];
 
-            if (canMove) {
-                // System.out.println(player);
-                player = switch_player(player);
-                // System.out.println(player + "turn value");
-                if (player == 1) {
-                    board[input1 - 1][input2 - 1] = "X";
+                boolean canMoveAI = checkMove(input1, input2, board);
 
+                if (canMoveAI) {
+                    board[input1][input2] = "O";
+                    player = switch_player(player);
                 } else {
-                    board[input1 - 1][input2 - 1] = "O";
-                }
-            } else {
-                System.out.println("invalid move, please try again");
-            }
-            if (checkWin(board)) {
-                System.out.println("Je hebt gewonnen!");
-                System.out.println("Wil je nog een keer spelen Y/N");
-                Scanner scanner = new Scanner(System.in);
-                String doorspelen = scanner.nextLine();
-                doorspelen = doorspelen.toUpperCase();
-                System.out.println(doorspelen);
-
-                char verder = doorspelen.charAt(0);
-                if (verder == 'Y') {
-                    System.out.println("user pressed Yes");
-
-                } else {
-
-                    System.out.println("ending ");
-                    end = true;
+                    continue;
                 }
             }
 
+            else {
+                System.out.println("Enter your move:");
+                System.out.println("For example: 1 to 3, \n" +
+                        "first is for the row, the second is column \n" +
+                        "be sure to put a , in between the numbers"); // can be in 1 print
+                String input = Scanner.nextLine();
+
+                String[] coordinates = input.split(",");
+
+                int input1 = Integer.parseInt(coordinates[0].trim());
+                int input2 = Integer.parseInt(coordinates[1].trim());
+
+                boolean canMove = Input_index(input1, input2, board);
+
+                if (canMove) {
+                    // System.out.println(player);
+                    player = switch_player(player);
+                    // System.out.println(player + "turn value");
+                    if (player == 1) {
+                        board[input1 - 1][input2 - 1] = "X";
+
+                    } else {
+                        board[input1 - 1][input2 - 1] = "O";
+                    }
+                } else {
+                    System.out.println("invalid move, please try again");
+                }
+                if (checkWin(board)) {
+                    System.out.println("Je hebt gewonnen!");
+                    System.out.println("Wil je nog een keer spelen Y/N");
+                    Scanner scanner = new Scanner(System.in);
+                    String doorspelen = scanner.nextLine();
+                    doorspelen = doorspelen.toUpperCase();
+                    System.out.println(doorspelen);
+
+                    char verder = doorspelen.charAt(0);
+                    if (verder == 'Y') {
+                        System.out.println("user pressed Yes");
+
+                    } else {
+
+                        System.out.println("ending ");
+                        end = true;
+                    }
+                }
+            }
             // check horizontal win
             // check vertical win
             // check diagonal win
@@ -221,8 +239,9 @@ public class Test {
         return board;
     }
 
-    public static void aisChoice() {
+    public static boolean aisChoice() {
         System.out.println(Arrays.toString(AI.aiChoice()));
+        return false;
     }
 
 }
