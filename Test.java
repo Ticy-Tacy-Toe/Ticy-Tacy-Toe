@@ -1,26 +1,29 @@
 package TicyTacyToe;
+
 import java.util.Objects;
 import java.util.Scanner;
 
 public class Test {
     public static void main(String[] args) {
         intro();
-        //whenever we start the code we call the method intro, to tell the user what it is
+        // whenever we start the code we call the method intro, to tell the user what it
+        // is
 
         String[][] board = createGrid();
 
-        Scanner userStart = new Scanner(System.in); //create a scanner so we can detect input from the user
-        //change userStart to scanner
+        Scanner userStart = new Scanner(System.in); // create a scanner so we can detect input from the user
+        // change userStart to scanner
 
         userStart.nextLine();
-        //wait for the user to press enter to continue
+        // wait for the user to press enter to continue
 
         int player = 2;
 
-         //doesn't do anything rn
+        // doesn't do anything rn
 
-        boolean end = false; //a boolean so we can go in a while to run the game until the user wants to quit
-        //and the value gets changed to true
+        boolean end = false; // a boolean so we can go in a while to run the game until the user wants to
+                             // quit
+        // and the value gets changed to true
         while (!end) {
 
             for (String[] row : board) {
@@ -32,7 +35,7 @@ public class Test {
             System.out.println("Enter your move:");
             System.out.println("For example: 1 to 3, \n" +
                     "first is for the row, the second is column \n" +
-                    "be sure to put a , in between the numbers"); //can be in 1 print
+                    "be sure to put a , in between the numbers"); // can be in 1 print
             String input = userStart.nextLine();
 
             String[] coordinates = input.split(",");
@@ -46,35 +49,28 @@ public class Test {
                 System.out.println(player);
                 player = switch_player(player);
                 System.out.println(player + "turn value");
-                if (player == 1){
+                if (player == 1) {
                     board[input1 - 1][input2 - 1] = "X";
-                   
+
+                } else {
+                    board[input1 - 1][input2 - 1] = "O";
                 }
-                else {
-                    board[input1 -1][input2 -1] = "O";
-                }
-            }
-            else {
+            } else {
                 System.out.println("invalid move, please try again");
             }
-
-
-            // input int - 1 so the user can select field 1 to 3
-            // check if input is valid so between 1 and 3
-            // check if the field is empty or not so is it a space or not
-            // if not we do the move, board[input1][input2]
+            System.out.println(checkRow(board) + "Je hebt met row gewonen");
+            System.out.println(checkColumn(board) + "je hebt met coulumn gewonnen");
+            System.out.println(chechDiagonal(board)+ "diagonaal gewonnen");
             // check horizontal win
             // check vertical win
             // check diagonal win
             // if checkWin return true:
-            //       winner receives winning messages + score goes up
-            //       loser receives a losing messages :(
-            //play again or close game
-            //hardcoded X for field location of the inputs
+            // winner receives winning messages + score goes up
+            // loser receives a losing messages :(
+            // play again or close game
 
         }
     }
-
 
     public static void intro() {
         System.out.println("Gday welcome to Ticy Tacy Toe!");
@@ -87,25 +83,25 @@ public class Test {
 
     public static String[][] createGrid() {
         String[][] board = {
-                {" ", " ", " "},
-                {" ", " ", " "},
-                {" ", " ", " "}
+                { " ", " ", " " },
+                { " ", " ", " " },
+                { " ", " ", " " }
         };
         return board;
     }
-  //change name of method
+
+    // change name of method
     public static int switch_player(int player) {
         if (player == 1) {
             return 2;
-        }
-        else {
+        } else {
             return 1;
         }
     }
 
-    //method can be way more compact
-    //immediantly go into the while loop
-    //use char instead of string
+    // method can be way more compact
+    // immediantly go into the while loop
+    // use char instead of string
     public static char chooseSymbol(Scanner scanner) {
         System.out.println("Choose X or O:");
 
@@ -135,18 +131,58 @@ public class Test {
         return checkMove(index, index2, board);
     }
 
-
     public static boolean checkMove(int row, int column, String[][] board) {
         System.out.println("method called");
-        
+
         if (row >= 0 && row <= 2 && column >= 0 && column <= 2) {
             return Objects.equals(board[row][column], " ");
-        }
-        else {
+        } else {
             return false;
         }
     }
 
+    public static boolean checkRow(String[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            // Ensure cell is not empty, then compare across all 3 columns
+            if (!board[i][0].equals(" ") &&
+                    board[i][0].equals(board[i][1]) &&
+                    board[i][1].equals(board[i][2])) {
+                return true; // Return true as soon as ANY row wins
+            }
+        }
 
+        return false; // Return false ONLY after all rows have been checked
+    }
 
+    public static boolean checkColumn(String[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            // Ensure cell is not empty, then compare across all 3 columns
+            if (!board[0][i].equals(" ") &&
+                    board[0][i].equals(board[1][i]) &&
+                    board[1][i].equals(board[2][i])) {
+                return true; // Return true as soon as ANY row wins
+            }
+        }
+
+        return false; // Return false ONLY after all rows have been checked
+    }
+
+    public static boolean chechDiagonal(String[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            if (!board[i][i].equals(" ") &&
+                    board[0][0].equals(board[1][1]) &&
+                    board[1][1].equals(board[2][2])) {
+                return true; // Return true as soon as ANY row wins
+            }
+        }
+        if (!board[0][2].equals(" ") &&
+                !board[1][1].equals(" ") &&
+                !board[2][0].equals(" ") &&
+                board[0][2].equals(board[1][1]) &&
+                board[1][1].equals(board[2][0])) {
+            return true; // Return true as soon as ANY row wins
+        } else {
+            return false;
+        }
+    }
 }
