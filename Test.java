@@ -1,5 +1,6 @@
 package TicyTacyToe;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -32,6 +33,7 @@ public class Test {
                 }
                 System.out.println();
             }
+            aisChoice();
             System.out.println("Enter your move:");
             System.out.println("For example: 1 to 3, \n" +
                     "first is for the row, the second is column \n" +
@@ -218,4 +220,9 @@ public class Test {
         }
         return board;
     }
+
+    public static void aisChoice() {
+        System.out.println(Arrays.toString(AI.aiChoice()));
+    }
+
 }
