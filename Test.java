@@ -45,11 +45,33 @@ public class Test {
 
                 if (canMoveAI) {
                     board[input1][input2] = "O";
-                    checkWin(board);
+                    boolean boolean1 = checkWin(board);
+                    if (boolean1 == true) {
+                        for (String[] row : board) {
+                            for (String cell : row) {
+                                System.out.print("[" + cell + "]");
+                            }
+                            System.out.println();
+                        }
+                    }
                     player = switch_player(player);
+
+                    if (checkWin(board)) {
+                        boolean test = endingScreen(player, board);
+                        System.out.println(test + "Bool");
+                        if (test == true) {
+                            System.out.println("end true");
+                            end = true;
+                        } else {
+                            System.out.println("Clearboard");
+                            clearBoard(board);
+                        }
+                    }
+
                 } else {
                     continue;
                 }
+
             }
 
             else {
@@ -82,11 +104,10 @@ public class Test {
                 if (checkWin(board)) {
                     boolean test = endingScreen(player, board);
                     System.out.println(test + "Bool");
-                    if (test == true){
+                    if (test == true) {
                         System.out.println("end true");
                         end = true;
-                    }
-                    else {
+                    } else {
                         System.out.println("Clearboard");
                         clearBoard(board);
                     }
