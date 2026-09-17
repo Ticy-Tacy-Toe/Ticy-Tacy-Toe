@@ -46,9 +46,9 @@ public class Test {
             boolean canMove = Input_index(input1, input2, board);
 
             if (canMove) {
-//                System.out.println(player);
+                // System.out.println(player);
                 player = switch_player(player);
-//                System.out.println(player + "turn value");
+                // System.out.println(player + "turn value");
                 if (player == 1) {
                     board[input1 - 1][input2 - 1] = "X";
 
@@ -58,11 +58,24 @@ public class Test {
             } else {
                 System.out.println("invalid move, please try again");
             }
-            if (checkWin(board)){
+            if (checkWin(board)) {
                 System.out.println("Je hebt gewonnen!");
-                end = true;
+                System.out.println("Wil je nog een keer spelen Y/N");
+                Scanner scanner = new Scanner(System.in);
+                String doorspelen = scanner.nextLine();
+                doorspelen = doorspelen.toUpperCase();
+                System.out.println(doorspelen);
+
+                char verder = doorspelen.charAt(0);
+                if (verder == 'Y') {
+                    System.out.println("user pressed Yes");
+
+                } else {
+
+                    System.out.println("ending ");
+                    end = true;
+                }
             }
-            
 
             // check horizontal win
             // check vertical win
@@ -188,13 +201,21 @@ public class Test {
         }
     }
 
-    public static boolean checkWin(String[][] board){
+    public static boolean checkWin(String[][] board) {
         if (checkRow(board) || checkColumn(board) || chechDiagonal(board)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
+    public static String[][] clearBoard(String[][] board) {
+        int n = board.length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                board[i][j] = " "; 
+            }
+        }
+        return board;
+    }
 }
