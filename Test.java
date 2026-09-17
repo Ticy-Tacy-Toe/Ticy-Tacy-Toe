@@ -11,10 +11,10 @@ public class Test {
 
         String[][] board = createGrid();
 
-        Scanner userStart = new Scanner(System.in); // create a scanner so we can detect input from the user
-        // change userStart to scanner
+        Scanner Scanner = new Scanner(System.in); // create a scanner so we can detect input from the user
+        // change Scanner to scanner
 
-        userStart.nextLine();
+        Scanner.nextLine();
         // wait for the user to press enter to continue
 
         int player = 2;
@@ -36,7 +36,7 @@ public class Test {
             System.out.println("For example: 1 to 3, \n" +
                     "first is for the row, the second is column \n" +
                     "be sure to put a , in between the numbers"); // can be in 1 print
-            String input = userStart.nextLine();
+            String input = Scanner.nextLine();
 
             String[] coordinates = input.split(",");
 
@@ -46,9 +46,9 @@ public class Test {
             boolean canMove = Input_index(input1, input2, board);
 
             if (canMove) {
-                System.out.println(player);
+//                System.out.println(player);
                 player = switch_player(player);
-                System.out.println(player + "turn value");
+//                System.out.println(player + "turn value");
                 if (player == 1) {
                     board[input1 - 1][input2 - 1] = "X";
 
@@ -135,7 +135,6 @@ public class Test {
     }
 
     public static boolean checkMove(int row, int column, String[][] board) {
-        System.out.println("method called");
 
         if (row >= 0 && row <= 2 && column >= 0 && column <= 2) {
             return Objects.equals(board[row][column], " ");
