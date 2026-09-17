@@ -58,9 +58,12 @@ public class Test {
             } else {
                 System.out.println("invalid move, please try again");
             }
-            System.out.println(checkRow(board) + "Je hebt met row gewonen");
-            System.out.println(checkColumn(board) + "je hebt met coulumn gewonnen");
-            System.out.println(chechDiagonal(board)+ "diagonaal gewonnen");
+            if (checkWin(board)){
+                System.out.println("Je hebt gewonnen!");
+                end = true;
+            }
+            
+
             // check horizontal win
             // check vertical win
             // check diagonal win
@@ -185,4 +188,14 @@ public class Test {
             return false;
         }
     }
+
+    public static boolean checkWin(String[][] board){
+        if (checkRow(board) || checkColumn(board) || chechDiagonal(board)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
