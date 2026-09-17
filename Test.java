@@ -17,7 +17,7 @@ public class Test {
 
         int player = 2;
 
-        player(player); //doesn't do anything rn
+         //doesn't do anything rn
 
         boolean end = false; //a boolean so we can go in a while to run the game until the user wants to quit
         //and the value gets changed to true
@@ -43,7 +43,16 @@ public class Test {
             boolean canMove = Input_index(input1, input2, board);
 
             if (canMove) {
-                board[input1 - 1][input2 - 1] = "X";
+                System.out.println(player);
+                player = switch_player(player);
+                System.out.println(player + "turn value");
+                if (player == 1){
+                    board[input1 - 1][input2 - 1] = "X";
+                   
+                }
+                else {
+                    board[input1 -1][input2 -1] = "O";
+                }
             }
             else {
                 System.out.println("invalid move, please try again");
@@ -85,8 +94,8 @@ public class Test {
         return board;
     }
   //change name of method
-    public static int player(int turn) {
-        if (turn == 1) {
+    public static int switch_player(int player) {
+        if (player == 1) {
             return 2;
         }
         else {
@@ -137,4 +146,7 @@ public class Test {
             return false;
         }
     }
+
+
+
 }
