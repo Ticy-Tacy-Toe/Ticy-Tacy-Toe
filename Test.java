@@ -1,21 +1,26 @@
 package TicyTacyToe;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Test {
     public static void main(String[] args) {
         intro();
+        //whenever we start the code we call the method intro, to tell the user what it is
 
         String[][] board = createGrid();
 
-        Scanner userStart = new Scanner(System.in);
+        Scanner userStart = new Scanner(System.in); //create a scanner so we can detect input from the user
+        //change userStart to scanner
 
         userStart.nextLine();
+        //wait for the user to press enter to continue
 
         int player = 2;
 
-        player(player);
+        player(player); //doesn't do anything rn
 
-        boolean end = false;
+        boolean end = false; //a boolean so we can go in a while to run the game until the user wants to quit
+        //and the value gets changed to true
         while (!end) {
 
             for (String[] row : board) {
@@ -25,12 +30,19 @@ public class Test {
                 System.out.println();
             }
             System.out.println("Enter your move:");
-            System.out.println("For example: 0, 2:");
+            System.out.println("For example: 1 to 3, \n" +
+                    "first is for the row, the second is column \n" +
+                    "be sure to put a , in between the numbers"); //can be in 1 print
             String input = userStart.nextLine();
 
+            String[] coordinates = input.split(",");
 
-            int input1 = Character.getNumericValue(input.charAt(0));
-            int input2 = Character.getNumericValue(input.charAt(2));
+            int input1 = Integer.parseInt(coordinates[0].trim());
+            int input2 = Integer.parseInt(coordinates[1].trim());
+
+            System.out.println("values inputs " + input1 + " " + input2);
+
+            System.out.println(checkMove(input1, input2, board));
 
             // input int - 1 so the user can select field 1 to 3
             // check if input is valid so between 1 and 3
@@ -44,7 +56,7 @@ public class Test {
             //       loser receives a losing messages :(
             //play again or close game
 
-            board[input1][input2] = "X";
+            board[input1][input2] = "X"; //hardcoded X for field location of the inputs
 
         }
     }
@@ -67,7 +79,7 @@ public class Test {
         };
         return board;
     }
-
+  //change name of method
     public static int player(int turn) {
         if (turn == 1) {
             return 2;
@@ -77,6 +89,9 @@ public class Test {
         }
     }
 
+    //method can be way more compact
+    //immediantly go into the while loop
+    //use char instead of string
     public static char chooseSymbol(Scanner scanner) {
         System.out.println("Choose X or O:");
 
@@ -98,4 +113,25 @@ public class Test {
 
         return symbol;
     }
+
+    public static boolean checkMove(int input1, int input2, String[][] board) {
+        System.out.println("method called");
+
+        int move1 = input1;
+        int move2 = input2;
+//        System.out.println(move1 + " " + move2);
+
+        if (Objects.equals(board[move1][move2], " ")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+
+
+
+
+    }
+
 }
