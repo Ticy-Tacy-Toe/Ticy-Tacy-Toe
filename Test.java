@@ -42,7 +42,7 @@ public class Test {
 
             System.out.println("values inputs " + input1 + " " + input2);
 
-            System.out.println(checkMove(input1, input2, board));
+            System.out.println(Input_index(input1, input2, board));
 
             // input int - 1 so the user can select field 1 to 3
             // check if input is valid so between 1 and 3
@@ -56,7 +56,7 @@ public class Test {
             //       loser receives a losing messages :(
             //play again or close game
 
-            board[input1][input2] = "X"; //hardcoded X for field location of the inputs
+            board[input1 - 1][input2 - 1] = "X"; //hardcoded X for field location of the inputs
 
         }
     }
@@ -114,24 +114,32 @@ public class Test {
         return symbol;
     }
 
+    public static boolean Input_index(int input1, int input2, String[][] board) {
+        int index = input1 - 1;
+        int index2 = input2 - 1;
+        System.out.println(index + " " + index2);
+        return checkMove(index, index2, board);
+    }
+
+
     public static boolean checkMove(int input1, int input2, String[][] board) {
         System.out.println("method called");
 
         int move1 = input1;
         int move2 = input2;
 //        System.out.println(move1 + " " + move2);
-
-        if (Objects.equals(board[move1][move2], " ")) {
-            return true;
+        
+        if (move1 >= 0 && move1 <= 2 && move2 >= 0 && move2 <= 2) {
+            if (Objects.equals(board[move1][move2], " ")) {
+              return true;
+            }
+            else {
+              return false;
+            }
         }
         else {
             return false;
         }
-
-
-
-
-
     }
 
 }
