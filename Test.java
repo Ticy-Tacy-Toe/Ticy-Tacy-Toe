@@ -52,8 +52,11 @@ public class Test {
                                 System.out.print("[" + cell + "]");
                             }
                             System.out.println();
+
                         }
+
                     }
+                    System.out.println();
                     player = switch_player(player);
 
                     if (checkWin(board)) {
@@ -76,7 +79,7 @@ public class Test {
 
             else {
                 System.out.println("Enter your move:");
-                System.out.println("For example: 1 to 3, \n" +
+                System.out.println("For example: 1 , 3 \n" +
                         "first is for the row, the second is column \n" +
                         "be sure to put a , in between the numbers"); // can be in 1 print
                 String input = Scanner.nextLine();
@@ -262,7 +265,7 @@ public class Test {
 
     public static boolean endingScreen(int winner, String[][] board) {
         if (winner == 1) {
-            System.out.println("Je hebt gewonnen!fafdasf");
+            System.out.println("Je hebt gewonnen!");
         }
 
         if (winner == 2) {
@@ -283,6 +286,25 @@ public class Test {
             System.out.println("ending");
             return true;
         }
+    }
+
+    public static boolean checkFull(String[][] board) {
+        int full = 0;
+        int n = board.length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] != " ") {
+                    full++;
+                }
+
+            }
+        }
+        if (full = n*n) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
 }
