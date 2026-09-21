@@ -23,7 +23,7 @@ public class Test {
         // doesn't do anything rn
 
         boolean end = false; // a boolean so we can go in a while to run the game until the user wants to
-                             // quit
+        // quit
         // and the value gets changed to true
         while (!end) {
 
@@ -299,7 +299,7 @@ public class Test {
 
             }
         }
-        if (full = n*n) {
+        if (full == n * n) {
             return true;
         } else {
             return false;
