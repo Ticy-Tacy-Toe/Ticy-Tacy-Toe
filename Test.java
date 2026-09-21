@@ -17,6 +17,9 @@ public class Test {
 
         Scanner.nextLine();
         // wait for the user to press enter to continue
+        Player humanPlayer = Player.createPlayer(Scanner, 2);
+        char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
+        Player aiPlayer = new Player("AI", aiSymbol, 1);
 
         int player = 2;
 
@@ -25,14 +28,13 @@ public class Test {
         boolean end = false; // a boolean so we can go in a while to run the game until the user wants to
         // quit
         // and the value gets changed to true
-        while (!end) {
-
-            for (String[] row : board) {
-                for (String cell : row) {
-                    System.out.print("[" + cell + "]");
-                }
-                System.out.println();
+        for (String[] row : board) {
+            for (String cell : row) {
+                System.out.print("[" + cell + "]");
             }
+            System.out.println();
+        }
+        while (!end) {
 
             if (player == 1) {
 
@@ -44,7 +46,7 @@ public class Test {
                 boolean canMoveAI = checkMove(input1, input2, board);
 
                 if (canMoveAI) {
-                    board[input1][input2] = "O";
+                    board[input1][input2] = String.valueOf(aiPlayer.getSymbol());
                     boolean boolean1 = checkWin(board);
                     if (boolean1 == true) {
                         for (String[] row : board) {
@@ -58,19 +60,26 @@ public class Test {
                     }
                     System.out.println();
                     player = switch_player(player);
-
-                    if (checkWin(board)) {
-                        boolean test = endingScreen(player, board);
-                        System.out.println(test + "Bool");
-                        if (test == true) {
-                            System.out.println("end true");
-                            end = true;
-                        } else {
-                            System.out.println("Clearboard");
-                            clearBoard(board);
+                    for (String[] row : board) {
+                        for (String cell : row) {
+                            System.out.print("[" + cell + "]");
                         }
-                    }
+                        System.out.println();
 
+                        if (checkWin(board)) {
+                            
+                            boolean test = endingScreen(player, board, humanPlayer, aiPlayer, checkFull(board));
+
+                            if (test == true) {
+                                System.out.println("end true");
+                                end = true;
+                            } else {
+
+                                clearBoard(board);
+                            }
+                        }
+
+                    }
                 } else {
                     continue;
                 }
@@ -96,22 +105,33 @@ public class Test {
                     player = switch_player(player);
                     // System.out.println(player + "turn value");
                     if (player == 1) {
-                        board[input1 - 1][input2 - 1] = "X";
+                        board[input1 - 1][input2 - 1] = String.valueOf(humanPlayer.getSymbol());
+                        for (String[] row : board) {
+                            for (String cell : row) {
+                                System.out.print("[" + cell + "]");
+                            }
+                            System.out.println();
+                        }
 
                     } else {
-                        board[input1 - 1][input2 - 1] = "O";
+                        board[input1 - 1][input2 - 1] = String.valueOf(aiPlayer.getSymbol());
+                        for (String[] row : board) {
+                            for (String cell : row) {
+                                System.out.print("[" + cell + "]");
+                            }
+                            System.out.println();
+                        }
                     }
                 } else {
                     System.out.println("invalid move, please try again");
                 }
                 if (checkWin(board)) {
-                    boolean test = endingScreen(player, board);
-                    System.out.println(test + "Bool");
+                    
+                    boolean test = endingScreen(player, board, humanPlayer, aiPlayer, checkFull(board));
                     if (test == true) {
                         System.out.println("end true");
                         end = true;
                     } else {
-                        System.out.println("Clearboard");
                         clearBoard(board);
                     }
                 }
@@ -241,7 +261,7 @@ public class Test {
     }
 
     public static boolean checkWin(String[][] board) {
-        if (checkRow(board) || checkColumn(board) || chechDiagonal(board)) {
+        if (checkRow(board) || checkColumn(board) || chechDiagonal(board) || checkFull(board)) {
             return true;
         } else {
             return false;
@@ -263,13 +283,22 @@ public class Test {
         return false;
     }
 
-    public static boolean endingScreen(int winner, String[][] board) {
-        if (winner == 1) {
-            System.out.println("Je hebt gewonnen!");
-        }
+    public static boolean endingScreen(int winner, String[][] board, Player humanPlayer, Player aiPlayer,
+            boolean checkFull) {
+        if (checkFull) {
+            System.out.println("Board is vol");
+        } else {
+            if (winner == 1) {
+                humanPlayer.addPoint();
+                System.out.println("Je hebt gewonnen!");
+            }
 
-        if (winner == 2) {
-            System.out.println("Je hebt verloren :(");
+            if (winner == 2) {
+                aiPlayer.addPoint();
+                System.out.println("Je hebt verloren :(");
+            }
+            System.out.println(humanPlayer.getName() + ": " + humanPlayer.getScore() + " points");
+            System.out.println(aiPlayer.getName() + ": " + aiPlayer.getScore() + " points");
         }
 
         System.out.println("Wil je nog een keer spelen Y/N");
