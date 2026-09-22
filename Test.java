@@ -10,7 +10,7 @@ public class Test {
         // whenever we start the code we call the method intro, to tell the user what it
         // is
 
-        String[][] board = createGrid();
+        Board board = new Board();
 
         Scanner Scanner = new Scanner(System.in); // create a scanner so we can detect input from the user
         // change Scanner to scanner
@@ -28,12 +28,7 @@ public class Test {
         boolean end = false; // a boolean so we can go in a while to run the game until the user wants to
         // quit
         // and the value gets changed to true
-        for (String[] row : board) {
-            for (String cell : row) {
-                System.out.print("[" + cell + "]");
-            }
-            System.out.println();
-        }
+        board.printboard();
         while (!end) {
 
             if (player == 1) {
@@ -46,44 +41,34 @@ public class Test {
                 boolean canMoveAI = checkMove(input1, input2, board);
 
                 if (canMoveAI) {
-                    board[input1][input2] = String.valueOf(aiPlayer.getSymbol());
-                    boolean boolean1 = checkWin(board);
-                    if (boolean1 == true) {
-                        for (String[] row : board) {
-                            for (String cell : row) {
-                                System.out.print("[" + cell + "]");
-                            }
-                            System.out.println();
-
-                        }
+                    String[][] grid = board.getBoard();
+                    grid[input1][input2] = String.valueOf(aiPlayer.getSymbol());
+                    boolean win = checkWin(board);
+                    if (win == true) {
+                        board.printboard();
 
                     }
                     System.out.println();
                     player = switch_player(player);
-                    for (String[] row : board) {
-                        for (String cell : row) {
-                            System.out.print("[" + cell + "]");
+                    board.printboard();
+
+                    if (checkWin(board)) {
+                        
+
+                        boolean test = endingScreen(player, grid, humanPlayer, aiPlayer, checkFull(grid));
+
+                        if (test == true) {
+                            System.out.println("end true");
+                            end = true;
+                        } else {
+
+                            board.clearBoard();
                         }
-                        System.out.println();
-
-                        if (checkWin(board)) {
-                            
-                            boolean test = endingScreen(player, board, humanPlayer, aiPlayer, checkFull(board));
-
-                            if (test == true) {
-                                System.out.println("end true");
-                                end = true;
-                            } else {
-
-                                clearBoard(board);
-                            }
-                        }
-
                     }
+
                 } else {
                     continue;
                 }
-
             }
 
             else {
@@ -105,8 +90,9 @@ public class Test {
                     player = switch_player(player);
                     // System.out.println(player + "turn value");
                     if (player == 1) {
-                        board[input1 - 1][input2 - 1] = String.valueOf(humanPlayer.getSymbol());
-                        for (String[] row : board) {
+                        String[][] grid = board.getBoard();
+                        grid[input1 - 1][input2 - 1] = String.valueOf(humanPlayer.getSymbol());
+                        for (String[] row : grid) {
                             for (String cell : row) {
                                 System.out.print("[" + cell + "]");
                             }
@@ -114,8 +100,9 @@ public class Test {
                         }
 
                     } else {
-                        board[input1 - 1][input2 - 1] = String.valueOf(aiPlayer.getSymbol());
-                        for (String[] row : board) {
+                        String[][] grid = board.getBoard();
+                        grid[input1 - 1][input2 - 1] = String.valueOf(aiPlayer.getSymbol());
+                        for (String[] row : grid) {
                             for (String cell : row) {
                                 System.out.print("[" + cell + "]");
                             }
@@ -126,25 +113,26 @@ public class Test {
                     System.out.println("invalid move, please try again");
                 }
                 if (checkWin(board)) {
-                    
-                    boolean test = endingScreen(player, board, humanPlayer, aiPlayer, checkFull(board));
+                    String [][] grid = board.getBoard();
+
+                    boolean test = endingScreen(player, grid, humanPlayer, aiPlayer, checkFull(grid));
                     if (test == true) {
                         System.out.println("end true");
                         end = true;
                     } else {
-                        clearBoard(board);
+                        board.clearBoard();
                     }
                 }
             }
-            // check horizontal win
-            // check vertical win
-            // check diagonal win
-            // if checkWin return true:
-            // winner receives winning messages + score goes up
-            // loser receives a losing messages :(
-            // play again or close game
-
         }
+        // check horizontal win
+        // check vertical win
+        // check diagonal win
+        // if checkWin return true:
+        // winner receives winning messages + score goes up
+        // loser receives a losing messages :(
+        // play again or close game
+
     }
 
     public static void intro() {
@@ -154,15 +142,6 @@ public class Test {
                 "          three of their marks in a horizontal, vertical, or diagonal row wins");
 
         System.out.println("Press enter to continue. :)");
-    }
-
-    public static String[][] createGrid() {
-        String[][] board = {
-                { " ", " ", " " },
-                { " ", " ", " " },
-                { " ", " ", " " }
-        };
-        return board;
     }
 
     // change name of method
@@ -199,17 +178,17 @@ public class Test {
         return symbol;
     }
 
-    public static boolean Input_index(int input1, int input2, String[][] board) {
+    public static boolean Input_index(int input1, int input2, Board board) {
         int index = input1 - 1;
         int index2 = input2 - 1;
         System.out.println(index + " " + index2);
         return checkMove(index, index2, board);
     }
 
-    public static boolean checkMove(int row, int column, String[][] board) {
-
+    public static boolean checkMove(int row, int column, Board board) {
+        String[][] grid = board.getBoard();
         if (row >= 0 && row <= 2 && column >= 0 && column <= 2) {
-            return Objects.equals(board[row][column], " ");
+            return Objects.equals(grid[row][column], " ");
         } else {
             return false;
         }
@@ -260,27 +239,13 @@ public class Test {
         }
     }
 
-    public static boolean checkWin(String[][] board) {
-        if (checkRow(board) || checkColumn(board) || chechDiagonal(board) || checkFull(board)) {
+    public static boolean checkWin(Board board) {
+        String[][] grid = board.getBoard();
+        if (checkRow(grid) || checkColumn(grid) || chechDiagonal(grid) || checkFull(grid)) {
             return true;
         } else {
             return false;
         }
-    }
-
-    public static String[][] clearBoard(String[][] board) {
-        int n = board.length;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                board[i][j] = " ";
-            }
-        }
-        return board;
-    }
-
-    public static boolean aisChoice() {
-        System.out.println(Arrays.toString(AI.aiChoice()));
-        return false;
     }
 
     public static boolean endingScreen(int winner, String[][] board, Player humanPlayer, Player aiPlayer,
