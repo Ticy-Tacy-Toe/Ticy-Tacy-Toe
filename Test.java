@@ -151,31 +151,6 @@ public class Test {
         }
     }
 
-    // method can be way more compact
-    // immediantly go into the while loop
-    // use char instead of string
-    public static char chooseSymbol(Scanner scanner) {
-        System.out.println("Choose X or O:");
-
-        String input = scanner.nextLine();
-        input = input.toUpperCase();
-
-        char symbol = input.charAt(0);
-
-        while (symbol != 'X' && symbol != 'O') {
-            System.out.println("Invalid choice. Choose X or O:");
-
-            input = scanner.nextLine();
-            input = input.toUpperCase();
-
-            symbol = input.charAt(0);
-
-            System.out.println(symbol);
-        }
-
-        return symbol;
-    }
-
     public static boolean Input_index(int input1, int input2, Board board) {
         int index = input1 - 1;
         int index2 = input2 - 1;
