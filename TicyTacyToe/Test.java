@@ -1,7 +1,7 @@
 package TicyTacyToe;
 
-import java.util.Scanner;
 import TicyTacyToe.Move.ValidateMove;
+import java.util.Scanner;
 
 public class Test {
     public static void main(String[] args) {
@@ -26,8 +26,10 @@ public class Test {
             if (player == 1) { //ai's turn
 
                 while (!validMove) {
+                    //Domme AI
                     int[] input = AI.aiChoice();
-                    
+                    // slimme AI
+                    //int[] aiMove = MinimaxAI.bestMove(board, aiPlayer.getSymbol(), humanPlayer);
                     int row = input[0]; 
                     int col = input[1];
 
