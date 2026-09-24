@@ -1,5 +1,6 @@
 package TicyTacyToe;
 
+import TicyTacyToe.AI.AI;
 import TicyTacyToe.Move.ValidateMove;
 import java.util.Scanner;
 

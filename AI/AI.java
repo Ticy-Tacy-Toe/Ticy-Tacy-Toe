@@ -1,4 +1,4 @@
-package TicyTacyToe;
+package TicyTacyToe.AI;
 
 import java.util.Arrays;
 
