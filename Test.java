@@ -1,6 +1,5 @@
 package TicyTacyToe;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -76,6 +75,9 @@ public class Test {
                         "first is for the row, the second is column \n" +
                         "be sure to put a , in between the numbers"); // can be in 1 print
                 String input = Scanner.nextLine();
+
+                boolean Test = ValidateMove.validateInput(input);
+                System.out.println(Test + "RESULT OF DA TEST");
 
                 String[] coordinates = input.split(",");
 
