@@ -1,8 +1,8 @@
-package TicyTacyToe;
+package TicyTacyToe.Move;
 
 import java.util.Scanner;
 
-public class Move {
+public class ValidateInput {
 
     public static void getMove() {
         Scanner scanner = new Scanner(System.in);
@@ -11,7 +11,7 @@ public class Move {
 
         if (!validateInput(input)) {
             System.out.println("Invalid input. Please enter two numbers separated by a comma.");
-            return;
+            
         } 
         String[] coordinates = input.split(",");
 
@@ -19,6 +19,7 @@ public class Move {
         int input2 = Integer.parseInt(coordinates[1].trim());
 
         System.out.println(input1 + ", " + input2);
+        scanner.close();
     }
 
     public static boolean validateInput(String input) {

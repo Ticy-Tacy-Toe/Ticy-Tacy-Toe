@@ -1,5 +1,7 @@
 package TicyTacyToe;
 
+import java.util.Objects;
+import TicyTacyToe.Test;
 public class Board {
 
     private final String[][] board;
@@ -98,5 +100,16 @@ public class Board {
         }
 
     }
+  public boolean checkMove(int row, int column) {
+        if (row >= 0 && row <= 2 && column >= 0 && column <= 2) {
+            return Objects.equals(board[row][column], " ");
+        } else {
+            return false;
+        }
+    }
 
+
+    public void doMove(int input1, int input2, char playerSymbol){
+        board[input1][input2] = String.valueOf(playerSymbol);
+    }
 }
