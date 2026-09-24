@@ -25,6 +25,7 @@ public class Test {
             boolean validMove = false;
 
             if (player == 1) { //ai's turn
+                //new line for commit
 
                 while (!validMove) {
                     //Domme AI
