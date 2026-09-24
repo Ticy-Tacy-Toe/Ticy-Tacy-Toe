@@ -52,10 +52,9 @@ public class Test {
                     player = switch_player(player);
                     board.printboard();
 
-                    if (checkWin(board)) {
-                        
+                    if (checkWin(board) || board.checkFull()) {
 
-                        boolean test = endingScreen(player, grid, humanPlayer, aiPlayer, checkFull(grid));
+                        boolean test = endingScreen(player, board, humanPlayer, aiPlayer, board.checkFull());
 
                         if (test == true) {
                             System.out.println("end true");
@@ -112,10 +111,9 @@ public class Test {
                 } else {
                     System.out.println("invalid move, please try again");
                 }
-                if (checkWin(board)) {
-                    String [][] grid = board.getBoard();
+                if (checkWin(board) || board.checkFull()) {
 
-                    boolean test = endingScreen(player, grid, humanPlayer, aiPlayer, checkFull(grid));
+                    boolean test = endingScreen(player, board, humanPlayer, aiPlayer, board.checkFull());
                     if (test == true) {
                         System.out.println("end true");
                         end = true;
@@ -194,63 +192,19 @@ public class Test {
         }
     }
 
-    public static boolean checkRow(String[][] board) {
-        for (int i = 0; i < board.length; i++) {
-            // Ensure cell is not empty, then compare across all 3 columns
-            if (!board[i][0].equals(" ") &&
-                    board[i][0].equals(board[i][1]) &&
-                    board[i][1].equals(board[i][2])) {
-                return true; // Return true as soon as ANY row wins
-            }
-        }
-
-        return false; // Return false ONLY after all rows have been checked
-    }
-
-    public static boolean checkColumn(String[][] board) {
-        for (int i = 0; i < board.length; i++) {
-            // Ensure cell is not empty, then compare across all 3 columns
-            if (!board[0][i].equals(" ") &&
-                    board[0][i].equals(board[1][i]) &&
-                    board[1][i].equals(board[2][i])) {
-                return true; // Return true as soon as ANY row wins
-            }
-        }
-
-        return false; // Return false ONLY after all rows have been checked
-    }
-
-    public static boolean chechDiagonal(String[][] board) {
-        for (int i = 0; i < board.length; i++) {
-            if (!board[i][i].equals(" ") &&
-                    board[0][0].equals(board[1][1]) &&
-                    board[1][1].equals(board[2][2])) {
-                return true; // Return true as soon as ANY row wins
-            }
-        }
-        if (!board[0][2].equals(" ") &&
-                !board[1][1].equals(" ") &&
-                !board[2][0].equals(" ") &&
-                board[0][2].equals(board[1][1]) &&
-                board[1][1].equals(board[2][0])) {
-            return true; // Return true as soon as ANY row wins
-        } else {
-            return false;
-        }
-    }
-
     public static boolean checkWin(Board board) {
-        String[][] grid = board.getBoard();
-        if (checkRow(grid) || checkColumn(grid) || chechDiagonal(grid) || checkFull(grid)) {
+        if (board.checkRow() || board.checkColumn() || board.checkDiagonal()) {
             return true;
         } else {
             return false;
         }
     }
 
-    public static boolean endingScreen(int winner, String[][] board, Player humanPlayer, Player aiPlayer,
+    
+
+    public static boolean endingScreen(int winner, Board board, Player humanPlayer, Player aiPlayer,
             boolean checkFull) {
-        if (checkFull) {
+        if (checkFull && !checkWin(board)) {
             System.out.println("Board is vol");
         } else {
             if (winner == 1) {
@@ -280,25 +234,6 @@ public class Test {
             System.out.println("ending");
             return true;
         }
-    }
-
-    public static boolean checkFull(String[][] board) {
-        int full = 0;
-        int n = board.length;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (board[i][j] != " ") {
-                    full++;
-                }
-
-            }
-        }
-        if (full == n * n) {
-            return true;
-        } else {
-            return false;
-        }
-
     }
 
 }
