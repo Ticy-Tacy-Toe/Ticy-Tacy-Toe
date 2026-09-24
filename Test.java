@@ -12,56 +12,13 @@ public class Test {
         Scanner scanner = new Scanner(System.in);
 
         scanner.nextLine();
-        Player humanPlayer = Player.createPlayer(scanner, 2);
-        char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
-        Player aiPlayer = new Player("AI", aiSymbol, 1);
-
-        int player = 2;
-        boolean end = false;
+       
+        runGameSequence(board, scanner);
+        
 
         board.printboard();
 
-        while (!end) {
-            boolean validMove = false;
-
-            if (player == 1) { //ai's turn
-                //new line for commit
-
-                while (!validMove) {
-                    //Domme AI
-                    int[] input = AI.aiChoice();
-                    // slimme AI
-                    //int[] aiMove = MinimaxAI.bestMove(board, aiPlayer.getSymbol(), humanPlayer);
-                    int row = input[0]; 
-                    int col = input[1];
-
-                    if (board.checkMove(row, col)) {
-                        board.doMove(row, col, aiPlayer.getSymbol());
-                        validMove = true; 
-                    }
-                }
-                System.out.println(" ");
-            } else { // our turn
-                System.out.println("\nEnter your move (example 1,3):");
-                String input = scanner.nextLine();
-                validMove = ValidateMove.validateMove(input, board, humanPlayer.getSymbol());
-            }
-            if (validMove) {
-                board.printboard();
-
-                if (checkWin(board) || board.checkFull()) {
-                    boolean wantsToStop = endingScreen(player, board, humanPlayer, aiPlayer, board.checkFull());
-                    if (wantsToStop) {
-                        end = true;
-                    } else {
-                        board.clearBoard();
-                        board.printboard();
-                    }
-                } else {
-                    player = switch_player(player); 
-                }
-            }
-        }
+        
     }
 
     public static void intro() {
@@ -106,5 +63,59 @@ public class Test {
             System.out.println("Goodbye!");
             return true; 
         }
+    }
+
+    public static void runGameSequence(Board board, Scanner scanner){
+        
+        Player humanPlayer = Player.createPlayer(scanner, 2);
+        char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
+        Player aiPlayer = new Player("AI", aiSymbol, 1);
+    
+        int playerID = 1;
+        boolean end = false;
+
+        while (!end) {
+            boolean validMove = false;
+
+            if (playerID == 1) { //ai's turn
+                //new line for commit
+
+                while (!validMove) {
+                    //Domme AI
+                    int[] input = AI.aiChoice();
+                    // slimme AI
+                    //int[] aiMove = MinimaxAI.bestMove(board, aiPlayer.getSymbol(), humanPlayer);
+                    int row = input[0]; 
+                    int col = input[1];
+
+                    if (board.checkMove(row, col)) {
+                        board.doMove(row, col, aiPlayer.getSymbol());
+                        validMove = true; 
+                    }
+                }
+                System.out.println(" ");
+            } else { // our turn
+                System.out.println("\nEnter your move (example 1,3):");
+                String input = scanner.nextLine();
+                validMove = ValidateMove.validateMove(input, board, humanPlayer.getSymbol());
+            }
+            if (validMove) {
+                board.printboard();
+
+                if (checkWin(board) || board.checkFull()) {
+                    boolean wantsToStop = endingScreen(playerID, board, humanPlayer, aiPlayer, board.checkFull());
+                    if (wantsToStop) {
+                        end = true;
+                    } else {
+                        board.clearBoard();
+                        board.printboard();
+                    }
+                } else {
+                    playerID = switch_player(playerID); 
+                }
+            }
+        }
+
+        
     }
 }
