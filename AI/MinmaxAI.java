@@ -3,7 +3,7 @@ package TicyTacyToe.AI;
 import TicyTacyToe.Board;
 import TicyTacyToe.Player;
 
-public class MinimaxAI {
+public class MinmaxAI {
     public static int miniMax(Board board, int depth, boolean isMaximizing, char aiSymbol, Player humanPlayer) {
         char winner = getWinner(board);
         boolean isFull = board.checkFull();

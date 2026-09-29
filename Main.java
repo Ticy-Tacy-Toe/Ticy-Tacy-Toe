@@ -1,10 +1,10 @@
 package TicyTacyToe;
 
-import TicyTacyToe.AI.AI;
+import TicyTacyToe.AI.RandomAI;
 import TicyTacyToe.Move.ValidateMove;
 import java.util.Scanner;
 
-public class Test {
+public class Main {
     public static void main(String[] args) {
         intro();
 
@@ -14,11 +14,8 @@ public class Test {
         scanner.nextLine();
        
         runGameSequence(board, scanner);
-        
 
         board.printboard();
-
-        
     }
 
     public static void intro() {
@@ -82,7 +79,7 @@ public class Test {
 
                 while (!validMove) {
                     //Domme AI
-                    int[] input = AI.aiChoice();
+                    int[] input = RandomAI.aiChoice();
                     // slimme AI
                     //int[] aiMove = MinimaxAI.bestMove(board, aiPlayer.getSymbol(), humanPlayer);
                     int row = input[0]; 

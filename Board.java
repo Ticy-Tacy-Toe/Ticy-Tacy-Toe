@@ -1,7 +1,7 @@
 package TicyTacyToe;
 
 import java.util.Objects;
-import TicyTacyToe.Test;
+
 public class Board {
 
     private final String[][] board;
