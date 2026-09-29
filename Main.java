@@ -1,7 +1,7 @@
 package TicyTacyToe;
 
 import TicyTacyToe.AI.RandomAI;
-import TicyTacyToe.Move.ValidateMove;
+import TicyTacyToe.Move.Move;
 import java.util.Scanner;
 
 public class Main {
@@ -86,17 +86,24 @@ public class Main {
                     int col = input[1];
 
                     if (board.checkMove(row, col)) {
-                        board.doMove(row, col, aiPlayer.getSymbol());
+                        board.doMove(input, aiPlayer.getSymbol());
                         validMove = true;
                     }
                 }
                 System.out.println(" ");
             } else { // our turn
-                System.out.println("\nEnter your move (example 1,3):");
-                String input = scanner.nextLine();
-                validMove = ValidateMove.validateMove(input, board, humanPlayer.getSymbol());
+                Move move = new Move();
+                int[] result = move.getMove();
+
+                int row = result[0];
+                int column = result[1];
+
+                if (board.checkMove(row, column)) {
+                    board.doMove(result, humanPlayer.getSymbol());
+                }
+
             }
-            if (validMove) {
+            
                 board.printboard();
 
                 if (checkWin(board) || board.checkFull()) {
@@ -110,7 +117,7 @@ public class Main {
                 } else {
                     playerID = switch_player(playerID);
                 }
-            }
+            
         }
 
 

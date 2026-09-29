@@ -18,13 +18,15 @@ public class Move implements MoveInterface {
 
             if (input.length == 2) {
                 try {
-                    return new int[]{
-                            Integer.parseInt(input[0]) - 1,
-                            Integer.parseInt(input[1]) - 1
-                    };
-                } catch (NumberFormatException ignored) {
-                }
+                    int row = Integer.parseInt(input[0]);
+                    int column = Integer.parseInt(input[1]);
 
+                    if (row > 0 && row <= 3 && column > 0 && column <=3) {
+                        return new int[]{row - 1, column - 1};
+                    }
+                } catch (NumberFormatException ignored) {
+                    // Input wasn't a number.
+                }
             }
 
             System.out.println("Invalid input.");
