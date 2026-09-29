@@ -12,7 +12,10 @@ public class RandomAI {
         int random = (int) (Math.random() * 3);
         int random2 = (int) (Math.random() * 3);
 
-        return new int[]{random, random2};
+        int return1 = random + 1;
+        int return2 = random2 + 1;
+
+        return new int[]{return1, return2};
     }
 
 }

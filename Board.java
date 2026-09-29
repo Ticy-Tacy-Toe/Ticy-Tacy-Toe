@@ -87,7 +87,7 @@ public class Board {
         int n = board.length;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (board[i][j] != " ") {
+                if (!board[i][j].equals(" ")) {
                     full++;
                 }
 

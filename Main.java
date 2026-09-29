@@ -12,7 +12,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         scanner.nextLine();
-       
+
         runGameSequence(board, scanner);
 
         board.printboard();
@@ -27,7 +27,7 @@ public class Main {
     }
 
     public static int switch_player(int player) {
-        return (player == 1) ? 2 : 1; 
+        return (player == 1) ? 2 : 1;
     }
 
     public static boolean checkWin(Board board) {
@@ -35,7 +35,7 @@ public class Main {
     }
 
     public static boolean endingScreen(int winner, Board board, Player humanPlayer, Player aiPlayer,
-            boolean checkFull) {
+                                       boolean checkFull) {
         if (checkFull && !checkWin(board)) {
             System.out.println("Board is full - draw!");
         } else {
@@ -58,16 +58,16 @@ public class Main {
             return false; // Speel door
         } else {
             System.out.println("Goodbye!");
-            return true; 
+            return true;
         }
     }
 
     public static void runGameSequence(Board board, Scanner scanner){
-        
+
         Player humanPlayer = Player.createPlayer(scanner, 2);
         char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
         Player aiPlayer = new Player("AI", aiSymbol, 1);
-    
+
         int playerID = 1;
         boolean end = false;
 
@@ -82,12 +82,12 @@ public class Main {
                     int[] input = RandomAI.aiChoice();
                     // slimme AI
                     //int[] aiMove = MinimaxAI.bestMove(board, aiPlayer.getSymbol(), humanPlayer);
-                    int row = input[0]; 
+                    int row = input[0];
                     int col = input[1];
 
                     if (board.checkMove(row, col)) {
                         board.doMove(row, col, aiPlayer.getSymbol());
-                        validMove = true; 
+                        validMove = true;
                     }
                 }
                 System.out.println(" ");
@@ -108,11 +108,11 @@ public class Main {
                         board.printboard();
                     }
                 } else {
-                    playerID = switch_player(playerID); 
+                    playerID = switch_player(playerID);
                 }
             }
         }
 
-        
+
     }
 }

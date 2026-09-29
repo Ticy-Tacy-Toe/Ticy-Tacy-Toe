@@ -3,9 +3,9 @@ package TicyTacyToe;
 import java.util.Scanner;
 
 public class Player {
-    private String name;
-    private char symbol;
-    private int number;
+    private final String name;
+    private final char symbol;
+    private final int number;
     private int score;
 
     public Player(String name, char symbol, int number) {
