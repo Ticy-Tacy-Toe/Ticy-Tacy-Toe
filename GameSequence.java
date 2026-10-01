@@ -12,14 +12,22 @@ import java.util.Scanner;
 public class GameSequence {
 
     public static void run(Board board, Scanner scanner) {
-        System.out.println("Choose your AI:");
-        System.out.println("1 = Easy AI");
-        System.out.println("2 = Hard AI");
-        int option = Integer.parseInt(scanner.nextLine());
-
         Player humanPlayer = new HumanPlayer(scanner, 2);
         char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
         Player aiPlayer = new AIPlayer(aiSymbol, 1, humanPlayer);
+
+        int option = 0;
+        while (option != 1 && option != 2) {
+        System.out.println("Kies AI: 1 = random, 2 = minimax");
+        String line = scanner.nextLine();
+        if (line.equals("1")) {
+            option = 1;
+        } else if (line.equals("2")) {
+            option = 2;
+        } else {
+            System.out.println("Invalid input");
+        }
+    }
 
         int playerID = 1;
         boolean end = false;
@@ -36,7 +44,7 @@ public class GameSequence {
                     } else {
                         aiMove = MinmaxAI.bestMove(board, aiSymbol, humanPlayer);
                     }
-
+                    
                     int row = aiMove[0];
                     int col = aiMove[1];
 

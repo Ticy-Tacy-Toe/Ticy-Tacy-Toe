@@ -1,10 +1,8 @@
 package TicyTacyToe.Players;
 
 import TicyTacyToe.Board;
-
-import java.util.Scanner;
-
 import TicyTacyToe.Move.*;
+import java.util.Scanner;
 //test
 public class HumanPlayer extends Player {
     
@@ -25,8 +23,15 @@ public class HumanPlayer extends Player {
 
         while (symbol != 'X' && symbol != 'O') {
             System.out.println("Choose X or O:");
-            String input = scanner.nextLine().toUpperCase();
-            symbol = input.charAt(0);
+            String input = scanner.nextLine().trim().toUpperCase();
+
+            if (input.equals("X")) {
+                symbol = 'X';
+            } else if (input.equals("O")) {
+                symbol = 'O';
+            } else {
+                System.out.println("Invalid input");
+            }
         }
 
         return symbol;
