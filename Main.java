@@ -2,6 +2,8 @@ package TicyTacyToe;
 
 import java.util.Scanner;
 
+import TicyTacyToe.Board;
+
 public class Main {
     public static void main(String[] args) {
         intro();

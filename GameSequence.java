@@ -1,5 +1,6 @@
 package TicyTacyToe;
 
+import TicyTacyToe.Board;
 import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
 import TicyTacyToe.Move.ValidateMove;
