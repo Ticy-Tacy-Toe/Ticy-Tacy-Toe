@@ -1,7 +1,7 @@
 package TicyTacyToe.AI;
 
 import TicyTacyToe.Board;
-import TicyTacyToe.Player;
+import TicyTacyToe.Players.Player;
 
 public class MinmaxAI {
     public static int miniMax(Board board, int depth, boolean isMaximizing, char aiSymbol, Player humanPlayer) {

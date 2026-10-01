@@ -2,6 +2,9 @@ package TicyTacyToe;
 
 import TicyTacyToe.AI.RandomAI;
 import TicyTacyToe.Move.ValidateMove;
+import TicyTacyToe.Players.AIPlayer;
+import TicyTacyToe.Players.HumanPlayer;
+import TicyTacyToe.Players.Player;
 import java.util.Scanner;
 
 public class Main {
@@ -64,9 +67,9 @@ public class Main {
 
     public static void runGameSequence(Board board, Scanner scanner){
         
-        Player humanPlayer = Player.createPlayer(scanner, 2);
+        Player humanPlayer = new HumanPlayer(scanner, 2);
         char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
-        Player aiPlayer = new Player("AI", aiSymbol, 1);
+        Player aiPlayer = new AIPlayer(aiSymbol, 1, humanPlayer);
     
         int playerID = 1;
         boolean end = false;
