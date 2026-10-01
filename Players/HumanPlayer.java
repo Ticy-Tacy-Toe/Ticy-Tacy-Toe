@@ -1,8 +1,10 @@
 package TicyTacyToe.Players;
 
 import TicyTacyToe.Board;
-import TicyTacyToe.Move.ValidateMove;
+
 import java.util.Scanner;
+
+import TicyTacyToe.Move.*;
 //test
 public class HumanPlayer extends Player {
     
@@ -30,21 +32,21 @@ public class HumanPlayer extends Player {
         return symbol;
     }
 
-    private int[] parseInput(String input) {
-        String[] parts = input.split(",");
-        int row = Integer.parseInt(parts[0].trim()) - 1;
-        int col = Integer.parseInt(parts[1].trim()) - 1;
-        return new int[]{row, col};
-    }
     
-    @Override
+    //@Override
+    //public int[] makeMove(Board board) {
+    //    System.out.println("\nEnter your move (example 1,3):");
+    //    String input = scanner.nextLine();
+    //    if (ValidateMove.validateMove(input, board, getSymbol())) {
+    //        return parseInput(input);
+    //    }
+    //    return makeMove(board);
+    //}
+
+    @Override 
     public int[] makeMove(Board board) {
-        System.out.println("\nEnter your move (example 1,3):");
-        String input = scanner.nextLine();
-        if (ValidateMove.validateMove(input, board, getSymbol())) {
-            return parseInput(input);
-        }
-        return makeMove(board);
+        Move move = new Move();
+        return move.getMove();
     }
 
 }

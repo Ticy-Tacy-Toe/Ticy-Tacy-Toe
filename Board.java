@@ -87,7 +87,7 @@ public class Board {
         int n = board.length;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (board[i][j] != " ") {
+                if (!board[i][j].equals(" ")) {
                     full++;
                 }
 
@@ -108,8 +108,12 @@ public class Board {
         }
     }
 
-
-    public void doMove(int input1, int input2, char playerSymbol){
-        board[input1][input2] = String.valueOf(playerSymbol);
+//new line for commit
+    public void doMove(int[] input, char playerSymbol){
+        int row = input[0];
+        int column = input[1];
+        if (checkMove(row, column)) {
+            board[row][column] = String.valueOf(playerSymbol);
+        }
     }
 }

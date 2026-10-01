@@ -1,9 +1,9 @@
 package TicyTacyToe;
 
-import TicyTacyToe.Board;
+
 import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
-import TicyTacyToe.Move.ValidateMove;
+import TicyTacyToe.Move.*;
 import TicyTacyToe.Players.AIPlayer;
 import TicyTacyToe.Players.HumanPlayer;
 import TicyTacyToe.Players.Player;
@@ -16,7 +16,7 @@ public class GameSequence {
         System.out.println("1 = Easy AI");
         System.out.println("2 = Hard AI");
         int option = Integer.parseInt(scanner.nextLine());
-        
+
         Player humanPlayer = new HumanPlayer(scanner, 2);
         char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
         Player aiPlayer = new AIPlayer(aiSymbol, 1, humanPlayer);
@@ -41,33 +41,39 @@ public class GameSequence {
                     int col = aiMove[1];
 
                     if (board.checkMove(row, col)) {
-                        board.doMove(row, col, aiPlayer.getSymbol());
+                        board.doMove(aiMove, aiPlayer.getSymbol());
                         validMove = true;
                     }
                 }
                 System.out.println(" ");
             } else { // our turn
-                System.out.println("\nEnter your move (example 1,3):");
-                String input = scanner.nextLine();
-                validMove = ValidateMove.validateMove(input, board, humanPlayer.getSymbol());
-            }
+                Move move = new Move();
+                int[] result = move.getMove();
 
-            if (validMove) {
-                board.printboard();
+                int row = result[0];
+                int column = result[1];
 
-                if (checkWin(board) || board.checkFull()) {
-                    boolean wantsToStop = endingScreen(playerID, board, humanPlayer, aiPlayer,
-                            board.checkFull(), scanner);
-                    if (wantsToStop) {
-                        end = true;
-                    } else {
-                        board.clearBoard();
-                        board.printboard();
-                    }
-                } else {
-                    playerID = switchPlayer(playerID);
+                if (board.checkMove(row, column)) {
+                    board.doMove(result, humanPlayer.getSymbol());
                 }
+
             }
+
+            board.printboard();
+
+            if (checkWin(board) || board.checkFull()) {
+                boolean wantsToStop = endingScreen(playerID, board, humanPlayer, aiPlayer,
+                        board.checkFull());
+                if (wantsToStop) {
+                    end = true;
+                } else {
+                    board.clearBoard();
+                    board.printboard();
+                }
+            } else {
+                playerID = switchPlayer(playerID);
+            }
+
         }
     }
 
@@ -79,8 +85,8 @@ public class GameSequence {
         return board.checkRow() || board.checkColumn() || board.checkDiagonal();
     }
 
-    private static boolean endingScreen(int winner, Board board, Player humanPlayer, Player aiPlayer,
-            boolean checkFull, Scanner scanner) {
+    public static boolean endingScreen(int winner, Board board, Player humanPlayer, Player aiPlayer,
+            boolean checkFull) {
         if (checkFull && !checkWin(board)) {
             System.out.println("Board is full - draw!");
         } else {
@@ -96,6 +102,7 @@ public class GameSequence {
         }
 
         System.out.println("Do you want to play again? Y/N");
+        Scanner scanner = new Scanner(System.in);
         String doorspelen = scanner.nextLine().toUpperCase();
 
         if (!doorspelen.isEmpty() && doorspelen.charAt(0) == 'Y') {
