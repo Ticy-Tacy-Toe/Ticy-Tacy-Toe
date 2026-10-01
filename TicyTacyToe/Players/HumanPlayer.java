@@ -3,7 +3,7 @@ package TicyTacyToe.Players;
 import TicyTacyToe.Board;
 import TicyTacyToe.Move.ValidateMove;
 import java.util.Scanner;
-
+//test
 public class HumanPlayer extends Player {
     
     private Scanner scanner;
