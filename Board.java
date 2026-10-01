@@ -108,7 +108,7 @@ public class Board {
         }
     }
 
-
+//new line for commit
     public void doMove(int[] input, char playerSymbol){
         int row = input[0];
         int column = input[1];
