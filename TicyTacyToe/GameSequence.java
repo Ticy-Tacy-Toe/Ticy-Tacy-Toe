@@ -1,5 +1,6 @@
 package TicyTacyToe;
 
+import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
 import TicyTacyToe.Move.ValidateMove;
 import TicyTacyToe.Players.AIPlayer;
@@ -10,6 +11,11 @@ import java.util.Scanner;
 public class GameSequence {
 
     public static void run(Board board, Scanner scanner) {
+        System.out.println("Choose your AI:");
+        System.out.println("1 = Easy AI");
+        System.out.println("2 = Hard AI");
+        int option = Integer.parseInt(scanner.nextLine());
+        
         Player humanPlayer = new HumanPlayer(scanner, 2);
         char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
         Player aiPlayer = new AIPlayer(aiSymbol, 1, humanPlayer);
@@ -22,12 +28,16 @@ public class GameSequence {
 
             if (playerID == 1) { // ai's turn
                 while (!validMove) {
-                    // Domme AI
-                    int[] input = RandomAI.aiChoice();
-                    // slimme AI
-                    //int[] aiMove = MinimaxAI.bestMove(board, aiPlayer.getSymbol(), humanPlayer);
-                    int row = input[0];
-                    int col = input[1];
+                    int[] aiMove;
+
+                    if (option == 1) {
+                        aiMove = RandomAI.aiChoice();
+                    } else {
+                        aiMove = MinmaxAI.bestMove(board, aiSymbol, humanPlayer);
+                    }
+
+                    int row = aiMove[0];
+                    int col = aiMove[1];
 
                     if (board.checkMove(row, col)) {
                         board.doMove(row, col, aiPlayer.getSymbol());
