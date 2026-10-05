@@ -1,8 +1,8 @@
-package TicyTacyToe;
+package TicyTacyToe.AI;
 
 import java.util.Arrays;
 
-public class AI {
+public class RandomAI {
     public static void main() {
 
         System.out.println(Arrays.toString(aiChoice()));
