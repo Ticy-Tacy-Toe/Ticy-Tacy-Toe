@@ -63,6 +63,9 @@ public class GameSequence {
 
                 if (board.checkMove(row, column)) {
                     board.doMove(result, humanPlayer.getSymbol());
+                } else {
+                    System.out.println("Invalid move");
+                    continue;
                 }
 
             }
