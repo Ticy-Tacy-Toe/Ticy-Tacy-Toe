@@ -12,28 +12,35 @@ import java.util.function.Consumer;
 
 public class ServerConnection {
 
+    private static final String SERVER_IP = "192.168.56.1";
+    private static final int SERVER_PORT = 7789;
+
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
 
-    private final BlockingQueue<String> responses = new LinkedBlockingQueue<>();
-    private Consumer<String> challengeHandler;
+    private final BlockingQueue<String> responses =
+            new LinkedBlockingQueue<>();
+
+    private volatile Consumer<String> challengeHandler;
 
     public boolean connectServer(String playerName) {
         try {
-            socket = new Socket("192.168.56.1", 7789);
+            socket = new Socket(SERVER_IP, SERVER_PORT);
+
             in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream())
             );
+
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            System.out.println("Successfully connected to the game server");
+            System.out.println("Connected to the game server.");
             System.out.println(in.readLine());
             System.out.println(in.readLine());
 
             out.println("login " + playerName);
-            String response = in.readLine();
 
+            String response = in.readLine();
             System.out.println("Login response: " + response);
 
             if (response == null || !response.equalsIgnoreCase("OK")) {
@@ -59,7 +66,9 @@ public class ServerConnection {
                         }
                     }
                 } catch (IOException e) {
-                    System.out.println("Disconnected from the game server.");
+                    if (socket != null && !socket.isClosed()) {
+                        System.out.println("Lost connection to the server.");
+                    }
                 }
             });
 
@@ -69,7 +78,9 @@ public class ServerConnection {
             return true;
 
         } catch (IOException e) {
-            System.out.println("Couldn't connect to the server.");
+            System.out.println("Could not connect to the game server at "
+                    + SERVER_IP + ":" + SERVER_PORT);
+            System.out.println("Check that the server is running and the IP is correct.");
             disconnect();
             return false;
         }
@@ -90,7 +101,9 @@ public class ServerConnection {
             return responses.take();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IOException("Interrupted while waiting for server response.", e);
+            throw new IOException(
+                    "Interrupted while waiting for server response.", e
+            );
         }
     }
 
