@@ -1,6 +1,8 @@
 package TicyTacyToe.CLI;
 
 
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Scanner;
 
 public class CLI {
@@ -53,4 +55,24 @@ public class CLI {
 
         return !input.isEmpty() && input.charAt(0) == 'Y';
     }
+
+
+    public static boolean offORon() {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Do you want to play online or offline?");
+            String answer = scanner.nextLine().trim().toLowerCase();
+
+            if (answer.equals("online")) {
+                return true;
+            } else if (answer.equals("offline")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter online or offline.");
+            }
+        }
+    }
+
+
 }

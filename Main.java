@@ -3,7 +3,7 @@ package TicyTacyToe;
 import java.util.Scanner;
 import TicyTacyToe.CLI.CLI;
 
-import TicyTacyToe.Server.ServerConnection;
+import TicyTacyToe.Server.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,19 +13,28 @@ public class Main {
 
         CLI.intro(scanner);
 
-        System.out.print("Enter your player name: ");
-        String playerName = scanner.nextLine();
+        boolean result = CLI.offORon();
 
-        ServerConnection connection = new ServerConnection();
+        if (result) {
+            System.out.print("Enter your player name: ");
+            String playerName = scanner.nextLine();
 
-        if (connection.connectServer(playerName)) {
-            GameSequence.run(board, scanner);
+            ServerConnection connection = new ServerConnection();
+
+            if (connection.connectServer(playerName)) {
+                ServerGame serverGame =
+                        new ServerGame(connection, scanner);
+
+                serverGame.start();
+            } else {
+                System.out.println("Could not log in to the game server.");
+            }
+
+            connection.disconnect();
         } else {
-            System.out.println("Could not log in to the game server.");
+            GameSequence.run(board, scanner);
+            board.printboard();
         }
-
-        board.printboard();
-        connection.disconnect();
 
 
     }
