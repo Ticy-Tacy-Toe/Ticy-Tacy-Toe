@@ -11,8 +11,6 @@ public class Main {
 
         CLI.intro(scanner);
 
-        scanner.nextLine();
-
         GameSequence.run(board, scanner);
 
         board.printboard();
