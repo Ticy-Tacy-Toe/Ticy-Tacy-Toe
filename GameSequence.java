@@ -2,6 +2,7 @@ package TicyTacyToe;
 
 import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
+import TicyTacyToe.CLI.CLI;
 import TicyTacyToe.Move.*;
 import TicyTacyToe.Players.AIPlayer;
 import TicyTacyToe.Players.HumanPlayer;
@@ -15,7 +16,7 @@ public class GameSequence {
         Player humanPlayer = new HumanPlayer(scanner, 2);
         Player aiPlayer = createAIPlayer(humanPlayer);
 
-        int aiOption = chooseAI(scanner);
+        int aiOption = CLI.chooseAI(scanner);
         int currentPlayer = 1;
         boolean gameOver = false;
 
@@ -45,23 +46,6 @@ public class GameSequence {
     private static Player createAIPlayer(Player humanPlayer) {
         char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
         return new AIPlayer(aiSymbol, 1, humanPlayer);
-    }
-
-    private static int chooseAI(Scanner scanner) {
-        while (true) {
-            System.out.println("Kies AI: 1 = random, 2 = minimax");
-            String input = scanner.nextLine();
-
-            if (input.equals("1")) {
-                return 1;
-            }
-
-            if (input.equals("2")) {
-                return 2;
-            }
-
-            System.out.println("Invalid input");
-        }
     }
 
     private static void playTurn(
@@ -134,7 +118,7 @@ public class GameSequence {
                 board.doMove(result, humanPlayer.getSymbol());
                 validMove = true;
             } else {
-                System.out.println("Invalid move");
+                CLI.invalidMove();
             }
         }
     }
@@ -161,45 +145,29 @@ public class GameSequence {
             Scanner scanner
     ) {
         if (board.checkFull() && !checkWin(board)) {
-            System.out.println("Board is full - draw!");
+            CLI.printGameResult("Board is full - draw!");
         } else if (winner == 2) {
             humanPlayer.addPoint();
-            System.out.println("you have won!");
+            CLI.printGameResult("you have won!");
         } else {
             aiPlayer.addPoint();
-            System.out.println("you lost :(");
+            CLI.printGameResult("you lost :(");
         }
 
         printScores(humanPlayer, aiPlayer);
 
-        return !wantsToPlayAgain(scanner);
+        return !CLI.wantsToPlayAgain(scanner);
     }
 
     private static void printScores(
             Player humanPlayer,
             Player aiPlayer
     ) {
-        System.out.println(
-                humanPlayer.getName()
-                        + ": "
-                        + humanPlayer.getScore()
-                        + " points"
+        CLI.printScores(
+                humanPlayer.getName(),
+                humanPlayer.getScore(),
+                aiPlayer.getName(),
+                aiPlayer.getScore()
         );
-
-        System.out.println(
-                aiPlayer.getName()
-                        + ": "
-                        + aiPlayer.getScore()
-                        + " points"
-        );
-    }
-
-    private static boolean wantsToPlayAgain(Scanner scanner) {
-        System.out.println("Do you want to play again? Y/N");
-
-        String input = scanner.nextLine().toUpperCase();
-
-        return !input.isEmpty() && input.charAt(0) == 'Y';
     }
 }
-
