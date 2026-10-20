@@ -21,7 +21,7 @@ public class ServerConnection {
 
     public boolean connectServer(String playerName) {
         try {
-            socket = new Socket("localhost", 7789);
+            socket = new Socket("192.168.56.1", 7789);
             in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream())
             );
