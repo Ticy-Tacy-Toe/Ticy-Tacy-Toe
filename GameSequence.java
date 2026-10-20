@@ -94,7 +94,7 @@ public class GameSequence {
             int aiOption
     ) {
         if (aiOption == 1) {
-            return RandomAI.aiChoice();
+            return RandomAI.aiChoice(board);
         }
 
         return MinmaxAI.bestMove(

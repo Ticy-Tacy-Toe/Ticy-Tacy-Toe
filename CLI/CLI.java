@@ -1,7 +1,5 @@
 package TicyTacyToe.CLI;
 
-import java.util.Scanner;
-
 public class CLI {
 
     public static void intro(Scanner scanner) {
