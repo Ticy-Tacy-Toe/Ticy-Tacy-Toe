@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public class ServerConnection {
 
-    private static final String SERVER_IP = "192.168.56.1";
+    private static final String SERVER_IP = "10.151.49.22";
     private static final int SERVER_PORT = 7789;
 
     private Socket socket;
