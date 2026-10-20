@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 public class ServerConnection {
 
@@ -13,25 +16,24 @@ public class ServerConnection {
     private BufferedReader in;
     private PrintWriter out;
 
+    private final BlockingQueue<String> responses = new LinkedBlockingQueue<>();
+    private Consumer<String> challengeHandler;
+
     public boolean connectServer(String playerName) {
         try {
             socket = new Socket("localhost", 7789);
-
             in = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
-
+                    new InputStreamReader(socket.getInputStream())
+            );
             out = new PrintWriter(socket.getOutputStream(), true);
 
             System.out.println("Successfully connected to the game server");
-            String greeting = in.readLine();
-            System.out.println(greeting);
-
-            String copyright = in.readLine();
-            System.out.println(copyright);
+            System.out.println(in.readLine());
+            System.out.println(in.readLine());
 
             out.println("login " + playerName);
-
             String response = in.readLine();
+
             System.out.println("Login response: " + response);
 
             if (response == null || !response.equalsIgnoreCase("OK")) {
@@ -39,14 +41,42 @@ public class ServerConnection {
                 return false;
             }
 
+            Thread listener = new Thread(() -> {
+                try {
+                    String message;
+
+                    while ((message = in.readLine()) != null) {
+                        if (message.contains("SVR GAME CHALLENGE")) {
+                            Consumer<String> handler = challengeHandler;
+
+                            if (handler != null) {
+                                handler.accept(message);
+                            } else {
+                                responses.offer(message);
+                            }
+                        } else {
+                            responses.offer(message);
+                        }
+                    }
+                } catch (IOException e) {
+                    System.out.println("Disconnected from the game server.");
+                }
+            });
+
+            listener.setDaemon(true);
+            listener.start();
+
             return true;
 
         } catch (IOException e) {
             System.out.println("Couldn't connect to the server.");
-            e.printStackTrace();
             disconnect();
             return false;
         }
+    }
+
+    public void setChallengeHandler(Consumer<String> handler) {
+        this.challengeHandler = handler;
     }
 
     public void sendCommand(String command) {
@@ -56,7 +86,12 @@ public class ServerConnection {
     }
 
     public String readResponse() throws IOException {
-        return in.readLine();
+        try {
+            return responses.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted while waiting for server response.", e);
+        }
     }
 
     public void disconnect() {
