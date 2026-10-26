@@ -1,3 +1,4 @@
+
 package TicyTacyToe.Server;
 
 import java.io.BufferedReader;
@@ -49,14 +50,19 @@ public class ServerConnection {
                     newSocket.getOutputStream(), true
             );
 
-            System.out.println("Connected to the game server.");
-            System.out.println(newIn.readLine());
-            System.out.println(newIn.readLine());
+            // Read the server greeting.
+            String greeting = newIn.readLine();
+            String instructions = newIn.readLine();
+
+            if (greeting == null || instructions == null) {
+                newSocket.close();
+                manuallyDisconnected = true;
+                return false;
+            }
 
             newOut.println("login " + playerName);
 
             String response = newIn.readLine();
-            System.out.println("Login response: " + response);
 
             if (response == null || !response.equalsIgnoreCase("OK")) {
                 newSocket.close();
@@ -85,6 +91,16 @@ public class ServerConnection {
             return true;
 
         } catch (IOException e) {
+            manuallyDisconnected = true;
+
+            if (newSocket != null) {
+                try {
+                    newSocket.close();
+                } catch (IOException ignored) {
+                    // The socket is already closed.
+                }
+            }
+
             System.out.println(
                     "Could not connect to the game server at "
                             + SERVER_IP + ":" + SERVER_PORT
@@ -92,16 +108,6 @@ public class ServerConnection {
             System.out.println(
                     "Check that the server is running and the IP is correct."
             );
-
-            manuallyDisconnected = true;
-
-            if (newSocket != null) {
-                try {
-                    newSocket.close();
-                } catch (IOException ignored) {
-                    // Socket already closed.
-                }
-            }
 
             return false;
         }
@@ -113,16 +119,7 @@ public class ServerConnection {
     }
 
     /**
-     * Drops the current connection on purpose and logs in again with the
-     * same name.
-     *
-     * The protocol has no "unsubscribe" or "cancel challenge" command.
-     * Disconnecting is the only way to withdraw a subscription or an
-     * outgoing challenge. Because disconnect() marks the drop as manual,
-     * the old listener thread does not report CONNECTION_LOST.
-     *
-     * The server may need a moment to notice the closed socket, so the
-     * login is retried a few times (a name must be unique on the server).
+     * Disconnects and logs in again with the same player name.
      */
     public synchronized boolean restart(String playerName) {
         disconnect();
@@ -151,15 +148,12 @@ public class ServerConnection {
             String message;
 
             while ((message = reader.readLine()) != null) {
-                System.out.println("[SERVER] " + message);
-
                 if (message.contains("SVR GAME CHALLENGE")) {
                     Consumer<String> handler = challengeHandler;
 
                     if (handler != null) {
                         String challenge = message;
 
-                        // Never block the socket listener with user input.
                         Thread challengeThread = new Thread(
                                 () -> handler.accept(challenge),
                                 "Incoming-Challenge"
@@ -175,7 +169,7 @@ public class ServerConnection {
                 }
             }
 
-        } catch (IOException e) {
+        } catch (IOException ignored) {
             // The connection may have closed.
         } finally {
             if (!manuallyDisconnected && socket == connectedSocket) {
@@ -191,14 +185,10 @@ public class ServerConnection {
     public synchronized void sendCommand(String command) {
         if (out == null || socket == null
                 || socket.isClosed() || !socket.isConnected()) {
-            System.out.println(
-                    "Cannot send command: not connected to the server."
-            );
             responses.offer(CONNECTION_LOST);
             return;
         }
 
-        System.out.println("[CLIENT] " + command);
         out.println(command);
 
         if (out.checkError()) {
@@ -218,14 +208,12 @@ public class ServerConnection {
         }
     }
 
-    /**
-     * Like readResponse(), but gives up after the timeout.
-     *
-     * @return the next message, or null if none arrived in time
-     */
     public String pollResponse(long timeoutMillis) throws IOException {
         try {
-            return responses.poll(timeoutMillis, TimeUnit.MILLISECONDS);
+            return responses.poll(
+                    timeoutMillis,
+                    TimeUnit.MILLISECONDS
+            );
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
 
@@ -244,8 +232,8 @@ public class ServerConnection {
         if (socket != null) {
             try {
                 socket.close();
-            } catch (IOException e) {
-                System.out.println("Error closing connection.");
+            } catch (IOException ignored) {
+                // The socket is already closed.
             }
         }
 
