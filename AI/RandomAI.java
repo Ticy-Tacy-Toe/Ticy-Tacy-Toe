@@ -1,21 +1,27 @@
 package TicyTacyToe.AI;
 
+import TicyTacyToe.Board;
 import java.util.Arrays;
 
 public class RandomAI {
-    public static void main() {
+    public static void main(String[] args) {
 
-        System.out.println(Arrays.toString(aiChoice()));
+        Board board = new Board();
+        
+        System.out.println(Arrays.toString(aiChoice(board)));
     }
 
-    public static int[] aiChoice() {
-        int random = (int) (Math.random() * 3);
-        int random2 = (int) (Math.random() * 3);
+    public static int[] aiChoice(Board board) {
+        int row;
+        int column;
 
-        int return1 = random + 1;
-        int return2 = random2 + 1;
+        do { 
+            row = (int) (Math.random() * 3);
+            column = (int) (Math.random() * 3);
+        } while (!board.checkMove(row, column));
 
-        return new int[]{return1, return2};
+        return new int[]{row, column};
+        
     }
 
 }

@@ -1,0 +1,125 @@
+package TicyTacyToe.Server;
+
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class ServerGame {
+
+    private final ServerConnection connection;
+    private final Scanner scanner;
+    private final String playerName;
+
+    private final String gameType = "tic-tac-toe";
+
+    public ServerGame(
+            ServerConnection connection,
+            Scanner scanner,
+            String playerName
+    ) {
+        this.connection = connection;
+        this.scanner = scanner;
+        this.playerName = playerName;
+
+        connection.setChallengeHandler(this::receiveChallenge);
+    }
+
+    public void findGame() {
+        System.out.println("Searching for an opponent...");
+        connection.sendCommand("subscribe " + gameType);
+        waitForGame();
+    }
+
+    public void challengePlayer() {
+        System.out.print("Enter the opponent's player name: ");
+        String opponentName = scanner.nextLine().trim();
+
+        if (opponentName.isEmpty()) {
+            System.out.println("Player name cannot be empty.");
+            return;
+        }
+
+        if (opponentName.equalsIgnoreCase(playerName)) {
+            System.out.println("You cannot challenge yourself.");
+            return;
+        }
+
+        connection.sendCommand(
+                "challenge \"" + opponentName + "\" \"" + gameType + "\""
+        );
+
+        System.out.println("Challenge sent to " + opponentName + ".");
+        waitForGame();
+    }
+
+    private void receiveChallenge(String message) {
+        System.out.println("\nIncoming challenge:");
+        System.out.println(message);
+
+        String challengeNumber = extractValue(message, "CHALLENGENUMBER");
+        String challenger = extractValue(message, "CHALLENGER");
+        String receivedGameType = extractValue(message, "GAMETYPE");
+
+        if (challengeNumber == null) {
+            System.out.println("Could not read the challenge number.");
+            return;
+        }
+
+        if (receivedGameType != null
+                && !receivedGameType.equalsIgnoreCase(gameType)) {
+            System.out.println("This challenge is for another game.");
+            return;
+        }
+
+        System.out.println(
+                "Player: " + (challenger == null ? "Unknown" : challenger)
+        );
+
+        System.out.print("Accept challenge? (yes/no): ");
+        String answer = scanner.nextLine().trim();
+
+        if (answer.equalsIgnoreCase("yes")
+                || answer.equalsIgnoreCase("y")) {
+
+            connection.sendCommand("challenge accept " + challengeNumber);
+            System.out.println("Challenge accepted.");
+
+            waitForGame();
+
+        } else {
+            System.out.println("Challenge declined.");
+        }
+    }
+
+    private void waitForGame() {
+        System.out.println("Waiting for the server to start the game...");
+
+        try {
+            GameSequence gameSequence =
+                    new GameSequence(connection, scanner, playerName);
+
+            gameSequence.start();
+
+        } catch (IOException e) {
+            System.out.println(
+                    "Error during the online game: " + e.getMessage()
+            );
+        }
+    }
+
+    private String extractValue(String message, String key) {
+        Pattern pattern = Pattern.compile(
+                key + "\\s*:\\s*\"?([^\",}]+)\"?",
+                Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher matcher = pattern.matcher(message);
+
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        }
+
+        return null;
+    }
+}

@@ -1,6 +1,6 @@
 package TicyTacyToe.Move;
 
-public interface MoveInterface {
+public interface MoverInterface {
 
     int[] getMove();
 }

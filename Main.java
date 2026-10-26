@@ -1,125 +1,41 @@
+
 package TicyTacyToe;
 
-import TicyTacyToe.AI.RandomAI;
-import TicyTacyToe.Move.Move;
 import java.util.Scanner;
+import TicyTacyToe.CLI.CLI;
+import TicyTacyToe.Server.*;
 
 public class Main {
+
     public static void main(String[] args) {
-        intro();
 
         Board board = new Board();
         Scanner scanner = new Scanner(System.in);
 
-        scanner.nextLine();
+        CLI.intro(scanner);
 
-        runGameSequence(board, scanner);
+        boolean result = CLI.offORon();
 
-        board.printboard();
-    }
+        if (result) {
+            System.out.print("Enter your player name: ");
+            String playerName = scanner.nextLine();
 
-    public static void intro() {
-        System.out.println("Gday welcome to Ticy Tacy Toe!");
-        System.out.println("Rules: Player 1 and player 2, represented by X and O, take turns \n" +
-                "marking the spaces in a 3*3 grid. The player who succeeds in placing \n" +
-                "three of their marks in a horizontal, vertical, or diagonal row wins");
-        System.out.println("Press enter to continue. :)");
-    }
+            ServerConnection connection = new ServerConnection();
 
-    public static int switch_player(int player) {
-        return (player == 1) ? 2 : 1;
-    }
+            if (connection.connectServer(playerName)) {
+                ServerMenu serverMenu =
+                        new ServerMenu(connection, scanner, playerName);
 
-    public static boolean checkWin(Board board) {
-        return board.checkRow() || board.checkColumn() || board.checkDiagonal();
-    }
-
-    public static boolean endingScreen(int winner, Board board, Player humanPlayer, Player aiPlayer,
-                                       boolean checkFull) {
-        if (checkFull && !checkWin(board)) {
-            System.out.println("Board is full - draw!");
-        } else {
-            if (winner == 2) {
-                humanPlayer.addPoint();
-                System.out.println("you have won!");
-            } else if (winner == 1) {
-                aiPlayer.addPoint();
-                System.out.println("you lost :(");
+                serverMenu.start();
+            } else {
+                System.out.println("Could not log in to the game server.");
             }
-            System.out.println(humanPlayer.getName() + ": " + humanPlayer.getScore() + " points");
-            System.out.println(aiPlayer.getName() + ": " + aiPlayer.getScore() + " points");
-        }
 
-        System.out.println("Do you want to play again? Y/N");
-        Scanner scanner = new Scanner(System.in);
-        String doorspelen = scanner.nextLine().toUpperCase();
+            connection.disconnect();
 
-        if (!doorspelen.isEmpty() && doorspelen.charAt(0) == 'Y') {
-            return false; // Speel door
         } else {
-            System.out.println("Goodbye!");
-            return true;
+            GameSequence.run(board, scanner);
+            board.printboard();
         }
-    }
-
-    public static void runGameSequence(Board board, Scanner scanner){
-
-        Player humanPlayer = Player.createPlayer(scanner, 2);
-        char aiSymbol = (humanPlayer.getSymbol() == 'X') ? 'O' : 'X';
-        Player aiPlayer = new Player("AI", aiSymbol, 1);
-
-        int playerID = 1;
-        boolean end = false;
-
-        while (!end) {
-            boolean validMove = false;
-
-            if (playerID == 1) { //ai's turn
-                //new line for commit
-
-                while (!validMove) {
-                    //Domme AI
-                    int[] input = RandomAI.aiChoice();
-                    // slimme AI
-                    //int[] aiMove = MinimaxAI.bestMove(board, aiPlayer.getSymbol(), humanPlayer);
-                    int row = input[0];
-                    int col = input[1];
-
-                    if (board.checkMove(row, col)) {
-                        board.doMove(input, aiPlayer.getSymbol());
-                        validMove = true;
-                    }
-                }
-                System.out.println(" ");
-            } else { // our turn
-                Move move = new Move();
-                int[] result = move.getMove();
-
-                int row = result[0];
-                int column = result[1];
-
-                if (board.checkMove(row, column)) {
-                    board.doMove(result, humanPlayer.getSymbol());
-                }
-
-            }
-            
-                board.printboard();
-
-                if (checkWin(board) || board.checkFull()) {
-                    boolean wantsToStop = endingScreen(playerID, board, humanPlayer, aiPlayer, board.checkFull());
-                    if (wantsToStop) {
-                        end = true;
-                    } else {
-                        board.clearBoard();
-                        board.printboard();
-                    }
-                } else {
-                    playerID = switch_player(playerID);
-                }
-            
-        }
-
-
     }
 }

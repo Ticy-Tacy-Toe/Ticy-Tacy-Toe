@@ -112,10 +112,8 @@ public class Board {
     public void doMove(int[] input, char playerSymbol){
         int row = input[0];
         int column = input[1];
-        if (checkMove(row, column)){
+        if (checkMove(row, column)) {
             board[row][column] = String.valueOf(playerSymbol);
-        } else {
-            
         }
     }
 }
