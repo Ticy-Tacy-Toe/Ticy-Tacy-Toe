@@ -62,7 +62,7 @@ public class Main {
             connection.disconnect();
 
         } else {
-            GameSequence.run(board, scanner);
+            OfflineGameController.run(board, scanner);
             board.printboard();
         }
     }
