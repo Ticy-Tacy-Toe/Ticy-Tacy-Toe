@@ -13,19 +13,27 @@ import java.util.Scanner;
 public class OfflineGameController {
 
     public static void run(Board board, Scanner scanner) {
-        Player humanPlayer = new HumanPlayer(scanner, 2);
-
         int aiOption = CLI.chooseAI(scanner);
 
+        Player humanPlayer;
         Player secondPlayer;
 
         if (aiOption == 3) {
-            secondPlayer = new HumanPlayer(scanner, 1);
+            humanPlayer = new HumanPlayer(scanner, 1);
+            secondPlayer = new HumanPlayer(scanner, 2);
+
+            if (humanPlayer.getSymbol() == secondPlayer.getSymbol()) {
+                System.out.println(
+                        "Both players cannot use the same symbol. Choose again."
+                );
+                return;
+            }
         } else {
+            humanPlayer = new HumanPlayer(scanner, 2);
             secondPlayer = createAIPlayer(humanPlayer);
         }
 
-        int currentPlayer = 1;
+        int currentPlayer = getStartingPlayer(humanPlayer, secondPlayer);
         boolean gameOver = false;
 
         while (!gameOver) {
@@ -53,7 +61,7 @@ public class OfflineGameController {
                 if (!gameOver) {
                     board.clearBoard();
                     board.printboard();
-                    currentPlayer = 1;
+                    currentPlayer = getStartingPlayer(humanPlayer, secondPlayer);
                 }
             } else {
                 currentPlayer = switchPlayer(currentPlayer);
@@ -215,5 +223,9 @@ public class OfflineGameController {
                 secondPlayer.getName(),
                 secondPlayer.getScore()
         );
+    }
+
+    private static int getStartingPlayer(Player firstPlayer, Player secondPlayer) {
+        return firstPlayer.getSymbol() == 'X' ? 1 : 2;
     }
 }

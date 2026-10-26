@@ -61,12 +61,12 @@ public class CLI {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Do you want to play online or offline?");
+            System.out.println("Do you want to play online?: Y/N");
             String answer = scanner.nextLine().trim().toLowerCase();
 
-            if (answer.equals("online")) {
+            if (answer.equalsIgnoreCase("Y")) {
                 return true;
-            } else if (answer.equals("offline")) {
+            } else if (answer.equalsIgnoreCase("N")) {
                 return false;
             } else {
                 System.out.println("Invalid input. Please enter online or offline.");

@@ -1,11 +1,13 @@
+
 package TicyTacyToe.Server;
+
+import TicyTacyToe.CLI.MainMenuCLI.MainMenuCLI;
 
 import java.util.Scanner;
 
 public class ServerMenu {
 
-    private final ServerGame serverGame;
-    private final Scanner scanner;
+    private final MainMenuCLI mainMenuCLI;
 
     public ServerMenu(
             ServerConnection connection,
@@ -13,9 +15,7 @@ public class ServerMenu {
             String playerName,
             int playerMode
     ) {
-        this.scanner = scanner;
-
-        this.serverGame = new ServerGame(
+        this.mainMenuCLI = new MainMenuCLI(
                 connection,
                 scanner,
                 playerName,
@@ -24,47 +24,6 @@ public class ServerMenu {
     }
 
     public void start() {
-        boolean running = true;
-
-        while (running) {
-            System.out.println("\n=== Online Tic-Tac-Toe ===");
-            System.out.println("1. Find a game");
-            System.out.println("2. Challenge a player");
-            System.out.println(
-                    "3. Incoming challenges ("
-                            + serverGame.pendingChallengeCount() + ")"
-            );
-            System.out.println("4. Wait for tournament match");
-            System.out.println("5. Back");
-            System.out.print("Choose an option: ");
-
-            String choice = scanner.nextLine().trim();
-
-            switch (choice) {
-                case "1":
-                    serverGame.findGame();
-                    break;
-
-                case "2":
-                    serverGame.challengePlayer();
-                    break;
-
-                case "3":
-                    serverGame.handleIncomingChallenges();
-                    break;
-
-                case "4":
-                    serverGame.waitForTournamentMatch();
-                    break;
-
-                case "5":
-                    running = false;
-                    break;
-
-                default:
-                    System.out.println("Invalid option.");
-                    break;
-            }
-        }
+        mainMenuCLI.start();
     }
 }

@@ -1,4 +1,73 @@
-package TicyTacyToe.CLI;
+package TicyTacyToe.CLI.MainMenuCLI;
+
+import TicyTacyToe.Server.ServerConnection;
+import TicyTacyToe.Server.ServerGame;
+
+import java.util.Scanner;
 
 public class MainMenuCLI {
+
+    private final ServerGame serverGame;
+    private final Scanner scanner;
+
+    public MainMenuCLI(
+            ServerConnection connection,
+            Scanner scanner,
+            String playerName,
+            int playerMode
+    ) {
+        this.scanner = scanner;
+
+        this.serverGame = new ServerGame(
+                connection,
+                scanner,
+                playerName,
+                playerMode
+        );
+    }
+
+    public void start() {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== Online Tic-Tac-Toe ===");
+            System.out.println("1. Find a game");
+            System.out.println("2. Challenge a player");
+            System.out.println(
+                    "3. Incoming challenges ("
+                            + serverGame.pendingChallengeCount() + ")"
+            );
+            System.out.println("4. Wait for tournament match");
+            System.out.println("5. Back");
+            System.out.print("Choose an option: ");
+
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    serverGame.findGame();
+                    break;
+
+                case "2":
+                    serverGame.challengePlayer();
+                    break;
+
+                case "3":
+                    serverGame.handleIncomingChallenges();
+                    break;
+
+                case "4":
+                    serverGame.waitForTournamentMatch();
+                    break;
+
+                case "5":
+                    running = false;
+                    break;
+
+                default:
+                    System.out.println("Invalid option.");
+                    break;
+            }
+        }
+    }
 }
