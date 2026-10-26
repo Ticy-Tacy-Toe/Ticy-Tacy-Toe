@@ -46,7 +46,7 @@ public class MainMenuCLI {
                             + serverGameCLI.pendingChallengeCount() + ")"
             );
             System.out.println("4. Wait for tournament match");
-            System.out.println("5. Back");
+            System.out.println("5. Quit");
             System.out.print("Choose an option: ");
 
             String choice = scanner.nextLine().trim();

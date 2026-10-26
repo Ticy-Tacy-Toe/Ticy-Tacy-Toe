@@ -41,9 +41,9 @@ public class MainCLI {
             return;
         }
 
-        ServerConnection connection = new ServerConnection();
+        int playerMode = chooseOnlinePlayerMode();
 
-        int playerMode = GameSequence.HUMAN;
+        ServerConnection connection = new ServerConnection();
 
         if (connection.connectServer(playerName)) {
             ServerMenu serverMenu = new ServerMenu(
@@ -61,5 +61,33 @@ public class MainCLI {
         }
 
         connection.disconnect();
+    }
+
+    private int chooseOnlinePlayerMode() {
+        System.out.println("\nChoose your online player:");
+        System.out.println("1. Human");
+        System.out.println("2. Random AI");
+        System.out.println("3. Minmax AI");
+
+        while (true) {
+            System.out.print("Choose an option: ");
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    return GameSequence.HUMAN;
+
+                case "2":
+                    return GameSequence.RANDOM_AI;
+
+                case "3":
+                    return GameSequence.MINMAX_AI;
+
+                default:
+                    System.out.println(
+                            "Invalid option. Enter 1, 2, or 3."
+                    );
+            }
+        }
     }
 }
