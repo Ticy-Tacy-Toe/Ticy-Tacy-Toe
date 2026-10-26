@@ -19,7 +19,7 @@ public class Main {
             System.out.print("Enter your player name: ");
             String playerName = scanner.nextLine();
 
-            ServerConnection connection = new ServerConnection();
+            ServerConnection connection = new ServerConnection("localhost");
 
             if (connection.connectServer(playerName)) {
                 ServerGame serverGame =

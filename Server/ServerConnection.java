@@ -12,8 +12,9 @@ import java.util.function.Consumer;
 
 public class ServerConnection {
 
-    private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 7789;
+
+    private final String serverIp;
 
     private Socket socket;
     private BufferedReader in;
@@ -22,12 +23,15 @@ public class ServerConnection {
     private final BlockingQueue<String> responses =
             new LinkedBlockingQueue<>();
 
-
     private volatile Consumer<String> challengeHandler;
+
+    public ServerConnection(String serverIp) {
+        this.serverIp = serverIp;
+    }
 
     public boolean connectServer(String playerName) {
         try {
-            socket = new Socket(SERVER_IP, SERVER_PORT);
+            socket = new Socket(serverIp, SERVER_PORT);
 
             in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream())
@@ -58,38 +62,39 @@ public class ServerConnection {
 
         } catch (IOException e) {
             System.out.println("Could not connect to the game server at "
-                    + SERVER_IP + ":" + SERVER_PORT);
-            System.out.println("Check that the server is running and the IP is correct.");
+                    + serverIp + ":" + SERVER_PORT);
+            System.out.println(
+                    "Check that the server is running and the IP is correct."
+            );
             disconnect();
             return false;
         }
     }
 
-    private void methode()
-    {
-            try {
-                String message;
+    private void methode() {
+        try {
+            String message;
 
-                while ((message = in.readLine()) != null) {
-                    if (message.contains("SVR GAME CHALLENGE")) {
-                        Consumer<String> handler = challengeHandler;
+            while ((message = in.readLine()) != null) {
+                if (message.contains("SVR GAME CHALLENGE")) {
+                    Consumer<String> handler = challengeHandler;
 
-                        if (handler != null) {
-                            handler.accept(message);
-                        } else {
-                            responses.offer(message);
-                        }
+                    if (handler != null) {
+                        handler.accept(message);
                     } else {
                         responses.offer(message);
                     }
-                }
-            } catch (IOException e) {
-                if (socket != null && !socket.isClosed()) {
-                    System.out.println("Lost connection to the server.");
+                } else {
+                    responses.offer(message);
                 }
             }
-        }
 
+        } catch (IOException e) {
+            if (socket != null && !socket.isClosed()) {
+                System.out.println("Lost connection to the server.");
+            }
+        }
+    }
 
     public void setChallengeHandler(Consumer<String> handler) {
         this.challengeHandler = handler;
