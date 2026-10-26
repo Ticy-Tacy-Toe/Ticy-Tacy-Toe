@@ -16,7 +16,7 @@ public class CLI {
 
     public static int chooseAI(Scanner scanner) {
         while (true) {
-            System.out.println("Kies AI: 1 = random, 2 = minimax");
+            System.out.println("Kies AI: \n1 = random, \n2 = minimax, \n3 = play localy");
             String input = scanner.nextLine();
 
             if (input.equals("1")) {
@@ -25,6 +25,9 @@ public class CLI {
 
             if (input.equals("2")) {
                 return 2;
+            }
+            if (input.equals("3")) {
+                return 3;
             }
 
             System.out.println("Invalid input");

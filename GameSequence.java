@@ -57,7 +57,7 @@ public class GameSequence {
             Scanner scanner
     ) {
         if (currentPlayer == 1) {
-            playAITurn(board, aiPlayer, humanPlayer, aiOption);
+            playAITurn(board, aiPlayer, humanPlayer, aiOption, scanner);
         } else {
             playHumanTurn(board, humanPlayer, scanner);
         }
@@ -67,7 +67,8 @@ public class GameSequence {
             Board board,
             Player aiPlayer,
             Player humanPlayer,
-            int aiOption
+            int aiOption,
+            Scanner scanner
     ) {
         boolean validMove = false;
 
@@ -76,7 +77,8 @@ public class GameSequence {
                     board,
                     aiPlayer,
                     humanPlayer,
-                    aiOption
+                    aiOption,
+                    scanner
             );
 
             if (board.checkMove(move[0], move[1])) {
@@ -92,17 +94,23 @@ public class GameSequence {
             Board board,
             Player aiPlayer,
             Player humanPlayer,
-            int aiOption
+            int aiOption,
+            Scanner scanner
     ) {
         if (aiOption == 1) {
             return RandomAI.aiChoice(board);
-        }
-
+        } 
+        if (aiOption == 2){
         return MinmaxAI.bestMove(
                 board,
                 aiPlayer.getSymbol(),
                 humanPlayer
         );
+        } 
+        else{
+            int[] move = secondPlayer(board,scanner);
+            return move;
+        }
     }
 
     private static void playHumanTurn(
@@ -172,4 +180,25 @@ public class GameSequence {
                 aiPlayer.getScore()
         );
     }
+
+    private static int[] secondPlayer(
+        Board board,
+        Scanner scanner
+) {
+    boolean validMove = false;
+    int[] result = null;
+
+    while (!validMove) {
+        Move move = new Move(scanner);
+        result = move.getMove();
+
+        if (board.checkMove(result[0], result[1])) {
+             validMove = true;
+        } else {
+             CLI.invalidMove();
+        }
+    }
+    
+    return result;
+}
 }
