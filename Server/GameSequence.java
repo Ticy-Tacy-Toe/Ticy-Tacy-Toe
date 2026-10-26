@@ -1,8 +1,6 @@
-
 package TicyTacyToe.Server;
 
 import TicyTacyToe.Board;
-import TicyTacyToe.Move.Move;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -13,7 +11,7 @@ public class GameSequence {
 
     private final ServerConnection connection;
     private final Board board;
-    private final Move move;
+    private final Scanner scanner;
     private final String playerName;
 
     private char playerSymbol;
@@ -25,9 +23,9 @@ public class GameSequence {
             String playerName
     ) {
         this.connection = connection;
+        this.scanner = scanner;
         this.playerName = playerName;
         this.board = new Board();
-        this.move = new Move(scanner);
     }
 
     public void start() throws IOException {
@@ -35,6 +33,13 @@ public class GameSequence {
 
         while (true) {
             String message = connection.readResponse();
+
+            if (message.equals(ServerConnection.CONNECTION_LOST)) {
+                if (reconnect()) {
+                    continue;
+                }
+                return;
+            }
 
             System.out.println(message);
 
@@ -61,23 +66,29 @@ public class GameSequence {
 
                 System.out.println("Match started!");
                 System.out.println("Your symbol: " + playerSymbol);
+                board.clearBoard();
                 board.printboard();
+
             } else if (message.contains("SVR GAME YOURTURN")) {
                 playMove();
+
             } else if (message.contains("SVR GAME MOVE")) {
-                processOpponentMove(message);
+                processMove(message);
+
             } else if (message.contains("SVR GAME WIN")) {
                 System.out.println("You won!");
                 board.printboard();
-                break;
+                returnToLobbyOrRematch();
+
             } else if (message.contains("SVR GAME LOSS")) {
                 System.out.println("You lost!");
                 board.printboard();
-                break;
+                returnToLobbyOrRematch();
+
             } else if (message.contains("SVR GAME DRAW")) {
                 System.out.println("The game is a draw!");
                 board.printboard();
-                break;
+                returnToLobbyOrRematch();
             }
         }
     }
@@ -86,36 +97,55 @@ public class GameSequence {
         board.printboard();
 
         while (true) {
-            int[] coordinates = move.getMove();
+            System.out.print(
+                    "Enter move (row, column), or type 'forfeit': "
+            );
 
-            int row = coordinates[0];
-            int column = coordinates[1];
+            String input = scanner.nextLine().trim();
 
-            if (!board.checkMove(row, column)) {
-                System.out.println("That position is already occupied.");
+            if (input.equalsIgnoreCase("forfeit")) {
+                connection.sendCommand("forfeit");
+                System.out.println("Forfeit requested.");
+                return;
+            }
+
+            String[] coordinates = input.replace(" ", "").split(",");
+
+            if (coordinates.length != 2) {
+                System.out.println("Invalid input. Example: 1,3");
                 continue;
             }
 
-            int position = row * 3 + column;
+            try {
+                int row = Integer.parseInt(coordinates[0]) - 1;
+                int column = Integer.parseInt(coordinates[1]) - 1;
 
-            connection.sendCommand("move " + position);
+                if (row < 0 || row > 2 || column < 0 || column > 2) {
+                    System.out.println("Enter row and column numbers from 1 to 3.");
+                    continue;
+                }
 
-            board.doMove(coordinates, playerSymbol);
-            board.printboard();
+                if (!board.checkMove(row, column)) {
+                    System.out.println("That position is already occupied.");
+                    continue;
+                }
 
-            break;
+                int position = row * 3 + column;
+                connection.sendCommand("move " + position);
+                return;
+
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Example: 1,3");
+            }
         }
     }
 
-    private void processOpponentMove(String message) {
+    private void processMove(String message) {
         String player = extractValue(message, "PLAYER");
         String serverMove = extractValue(message, "MOVE");
 
         if (player == null || serverMove == null) {
-            return;
-        }
-
-        if (player.equalsIgnoreCase(playerName)) {
+            System.out.println("Could not read the server's move.");
             return;
         }
 
@@ -130,16 +160,73 @@ public class GameSequence {
             int row = position / 3;
             int column = position % 3;
 
+            char symbol = player.equalsIgnoreCase(playerName)
+                    ? playerSymbol
+                    : opponentSymbol;
+
             if (board.checkMove(row, column)) {
-                board.doMove(new int[]{row, column}, opponentSymbol);
+                board.doMove(new int[]{row, column}, symbol);
                 board.printboard();
             } else {
-                System.out.println("Received a move for an occupied position.");
+                System.out.println(
+                        "The server reported an occupied position. "
+                                + "The local board may be out of sync."
+                );
             }
 
         } catch (NumberFormatException e) {
-            System.out.println("Could not read the opponent's move.");
+            System.out.println("Could not read the server's move.");
         }
+    }
+
+    private void returnToLobbyOrRematch() {
+        System.out.println("\n=== Match Finished ===");
+        System.out.println("1. Rematch (find another opponent)");
+        System.out.println("2. Return to lobby");
+
+        while (true) {
+            System.out.print("Choose an option: ");
+            String choice = scanner.nextLine().trim();
+
+            if (choice.equals("1")) {
+                board.clearBoard();
+                connection.sendCommand("subscribe tic-tac-toe");
+                System.out.println("Searching for another opponent...");
+                return;
+
+            } else if (choice.equals("2")) {
+                System.out.println("Returning to the lobby...");
+                return;
+
+            } else {
+                System.out.println("Invalid option. Enter 1 or 2.");
+            }
+        }
+    }
+
+    private boolean reconnect() {
+        System.out.println("Connection to the server was lost.");
+        System.out.print("Attempt to reconnect? (y/n): ");
+
+        String answer = scanner.nextLine().trim();
+
+        if (!answer.equalsIgnoreCase("y")) {
+            System.out.println("Returning from the online match.");
+            return false;
+        }
+
+        System.out.println("Reconnecting...");
+
+        if (connection.reconnect(playerName)) {
+            System.out.println("Reconnected to the server.");
+            System.out.println(
+                    "Restoring the previous match depends on server support."
+            );
+            return true;
+        }
+
+        System.out.println("Could not reconnect to the server.");
+        return false;
     }
 
     private String extractValue(String message, String key) {
