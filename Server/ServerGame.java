@@ -246,4 +246,13 @@ public class ServerGame {
 
         return null;
     }
+
+    public void waitForTournamentMatch() {
+        System.out.println("Waiting for a tournament match...");
+        System.out.println(
+                "The tournament server must assign your match."
+        );
+
+        waitForGame(0, null);
+    }
 }

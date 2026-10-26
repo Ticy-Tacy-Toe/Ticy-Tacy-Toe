@@ -29,7 +29,8 @@ public class ServerMenu {
                     "3. Incoming challenges ("
                             + serverGame.pendingChallengeCount() + ")"
             );
-            System.out.println("4. Back");
+            System.out.println("4. Wait for tournament match");
+            System.out.println("5. Back");
             System.out.print("Choose an option: ");
 
             String choice = scanner.nextLine().trim();
@@ -48,6 +49,10 @@ public class ServerMenu {
                     break;
 
                 case "4":
+                    serverGame.waitForTournamentMatch();
+                    break;
+
+                case "5":
                     running = false;
                     break;
 
