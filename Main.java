@@ -23,7 +23,7 @@ public class Main {
 
             if (connection.connectServer(playerName)) {
                 ServerGame serverGame =
-                        new ServerGame(connection, scanner);
+                        new ServerGame(connection, scanner, playerName);
 
                 serverGame.start();
             } else {

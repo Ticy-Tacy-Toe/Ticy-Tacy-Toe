@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 public class ServerConnection {
 
-    private static final String SERVER_IP = "10.151.49.22";
+    private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 7789;
 
     private Socket socket;
@@ -21,6 +21,7 @@ public class ServerConnection {
 
     private final BlockingQueue<String> responses =
             new LinkedBlockingQueue<>();
+
 
     private volatile Consumer<String> challengeHandler;
 
@@ -35,6 +36,7 @@ public class ServerConnection {
             out = new PrintWriter(socket.getOutputStream(), true);
 
             System.out.println("Connected to the game server.");
+
             System.out.println(in.readLine());
             System.out.println(in.readLine());
 
@@ -48,30 +50,7 @@ public class ServerConnection {
                 return false;
             }
 
-            Thread listener = new Thread(() -> {
-                try {
-                    String message;
-
-                    while ((message = in.readLine()) != null) {
-                        if (message.contains("SVR GAME CHALLENGE")) {
-                            Consumer<String> handler = challengeHandler;
-
-                            if (handler != null) {
-                                handler.accept(message);
-                            } else {
-                                responses.offer(message);
-                            }
-                        } else {
-                            responses.offer(message);
-                        }
-                    }
-                } catch (IOException e) {
-                    if (socket != null && !socket.isClosed()) {
-                        System.out.println("Lost connection to the server.");
-                    }
-                }
-            });
-
+            Thread listener = new Thread(this::methode);
             listener.setDaemon(true);
             listener.start();
 
@@ -85,6 +64,32 @@ public class ServerConnection {
             return false;
         }
     }
+
+    private void methode()
+    {
+            try {
+                String message;
+
+                while ((message = in.readLine()) != null) {
+                    if (message.contains("SVR GAME CHALLENGE")) {
+                        Consumer<String> handler = challengeHandler;
+
+                        if (handler != null) {
+                            handler.accept(message);
+                        } else {
+                            responses.offer(message);
+                        }
+                    } else {
+                        responses.offer(message);
+                    }
+                }
+            } catch (IOException e) {
+                if (socket != null && !socket.isClosed()) {
+                    System.out.println("Lost connection to the server.");
+                }
+            }
+        }
+
 
     public void setChallengeHandler(Consumer<String> handler) {
         this.challengeHandler = handler;

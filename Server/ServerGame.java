@@ -1,7 +1,5 @@
-
 package TicyTacyToe.Server;
 
-import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,103 +8,119 @@ public class ServerGame {
 
     private final ServerConnection connection;
     private final Scanner scanner;
+    private final String playerName;
 
-    public ServerGame(ServerConnection connection, Scanner scanner) {
+    private String gameType = "tic-tac-toe";
+    private boolean gameStarted = false;
+
+    public ServerGame(ServerConnection connection, Scanner scanner, String playerName) {
         this.connection = connection;
         this.scanner = scanner;
+        this.playerName = playerName;
 
         connection.setChallengeHandler(this::receiveChallenge);
     }
 
     public void start() {
-        System.out.println("1. Find a game");
-        System.out.println("2. Challenge a player");
+        boolean running = true;
 
-        int choice = 0;
+        while (running) {
+            System.out.println("\n=== Online Tic-Tac-Toe ===");
+            System.out.println("1. Find a game");
+            System.out.println("2. Challenge a player");
+            System.out.println("3. Show supported game types");
+            System.out.println("4. Back");
+            System.out.print("Choose an option: ");
 
-        while (choice != 1 && choice != 2) {
-            synchronized (scanner) {
-                System.out.print("Choose an option: ");
+            String choice = scanner.nextLine();
 
-                if (scanner.hasNextInt()) {
-                    choice = scanner.nextInt();
-                    scanner.nextLine();
-                } else {
-                    scanner.nextLine();
-                }
+            switch (choice) {
+                case "1":
+                    findGame();
+                    break;
+
+                case "2":
+                    challengePlayer();
+                    break;
+
+                case "3":
+                    showGameTypes();
+                    break;
+
+                case "4":
+                    running = false;
+                    break;
+
+                default:
+                    System.out.println("Invalid option.");
+                    break;
             }
-
-            if (choice != 1 && choice != 2) {
-                System.out.println("Invalid input.");
-            }
-        }
-
-        if (choice == 1) {
-            findGame();
-        } else {
-            challengePlayer();
         }
     }
 
     private void findGame() {
-        connection.sendCommand("subscribe tictactoe");
-
-        System.out.println("Searching for a Tic-Tac-Toe opponent...");
-        System.out.println("Waiting for an opponent or an incoming challenge.");
-
-        readServerMessages();
+        System.out.println("Searching for an opponent...");
+        connection.sendCommand("subscribe " + gameType);
+        waitForGame();
     }
 
     private void challengePlayer() {
-        String playerName;
+        System.out.print("Enter the opponent's player name: ");
+        String opponentName = scanner.nextLine().trim();
 
-        synchronized (scanner) {
-            System.out.print("Enter the player's name: ");
-            playerName = scanner.nextLine().trim();
-        }
-
-        if (playerName.isEmpty()) {
+        if (opponentName.isEmpty()) {
             System.out.println("Player name cannot be empty.");
             return;
         }
 
-        connection.sendCommand(
-                "challenge \"" + playerName + "\" \"tictactoe\""
-        );
-
-        System.out.println("Challenge sent to " + playerName + ".");
-        System.out.println("Waiting for the response...");
-
-        readServerMessages();
-    }
-
-    private void receiveChallenge(String message) {
-        String challenger = extractValue(message, "CHALLENGER");
-        String challengeNumber = extractValue(message, "CHALLENGENUMBER");
-
-        if (challenger == null || challengeNumber == null) {
-            System.out.println("Received a challenge, but could not read its details.");
-            System.out.println(message);
+        if (opponentName.equalsIgnoreCase(playerName)) {
+            System.out.println("You cannot challenge yourself.");
             return;
         }
 
-        System.out.println();
-        System.out.println("You received a Tic-Tac-Toe challenge!");
-        System.out.println("From: " + challenger);
+        connection.sendCommand(
+                "challenge \"" + opponentName + "\" \"" + gameType + "\""
+        );
 
-        String answer;
+        System.out.println("Challenge sent to " + opponentName + ".");
+        waitForGame();
+    }
 
-        synchronized (scanner) {
-            System.out.print("Accept this challenge? (yes/no): ");
-            answer = scanner.nextLine().trim();
+    private void showGameTypes() {
+        System.out.println("Requesting supported game types...");
+        connection.sendCommand("get gamelist");
+    }
+
+    private void receiveChallenge(String message) {
+        System.out.println("\nIncoming challenge:");
+        System.out.println(message);
+
+        String challengeNumber = extractValue(message, "CHALLENGENUMBER");
+        String challenger = extractValue(message, "CHALLENGER");
+        String receivedGameType = extractValue(message, "GAMETYPE");
+
+        if (challengeNumber == null) {
+            System.out.println("Could not read the challenge number.");
+            return;
         }
+
+        if (receivedGameType != null
+                && !receivedGameType.equalsIgnoreCase(gameType)) {
+            System.out.println("This challenge is for another game.");
+            return;
+        }
+
+        System.out.println("Player: " +
+                (challenger != null ? challenger : "Unknown"));
+        System.out.print("Accept challenge? (yes/no): ");
+
+        String answer = scanner.nextLine().trim();
 
         if (answer.equalsIgnoreCase("yes")
                 || answer.equalsIgnoreCase("y")) {
-
             connection.sendCommand("challenge accept " + challengeNumber);
-            System.out.println("Challenge accepted!");
-
+            System.out.println("Challenge accepted.");
+            waitForGame();
         } else {
             System.out.println("Challenge declined.");
         }
@@ -114,45 +128,21 @@ public class ServerGame {
 
     private String extractValue(String message, String key) {
         Pattern pattern = Pattern.compile(
-                key + "\\s*:\\s*\"([^\"]+)\"",
+                key + "\\s*:\\s*\"?([^\",}]+)\"?",
                 Pattern.CASE_INSENSITIVE
         );
 
         Matcher matcher = pattern.matcher(message);
 
         if (matcher.find()) {
-            return matcher.group(1);
+            return matcher.group(1).trim();
         }
 
         return null;
     }
 
-    private void readServerMessages() {
-        try {
-            while (true) {
-                String message = connection.readResponse();
-
-                if (message == null) {
-                    System.out.println("Connection closed by server.");
-                    return;
-                }
-
-                System.out.println("Server: " + message);
-
-                if (message.contains("SVR GAME MATCH")) {
-                    System.out.println("Match found! Ready to start the game.");
-                    return;
-                }
-
-                if (message.contains("SVR GAME WIN")
-                        || message.contains("SVR GAME LOSS")
-                        || message.contains("SVR GAME DRAW")) {
-                    System.out.println("Game finished.");
-                    return;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error communicating with server.");
-        }
+    private void waitForGame() {
+        System.out.println("Waiting for the server to start the game...");
+        System.out.println("Return to the game menu when the match begins.");
     }
 }
