@@ -10,11 +10,16 @@ public class ServerMenu {
     public ServerMenu(
             ServerConnection connection,
             Scanner scanner,
-            String playerName
+            String playerName,
+            int playerMode
     ) {
         this.scanner = scanner;
+
         this.serverGame = new ServerGame(
-                connection, scanner, playerName
+                connection,
+                scanner,
+                playerName,
+                playerMode
         );
     }
 

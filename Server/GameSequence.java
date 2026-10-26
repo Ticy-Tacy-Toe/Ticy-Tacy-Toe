@@ -1,6 +1,8 @@
 package TicyTacyToe.Server;
 
 import TicyTacyToe.Board;
+import TicyTacyToe.AI.MinmaxAI;
+import TicyTacyToe.AI.RandomAI;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -11,20 +13,21 @@ public class GameSequence {
 
     private static final long POLL_INTERVAL_MILLIS = 200;
 
+    public static final int HUMAN = 0;
+    public static final int RANDOM_AI = 1;
+    public static final int MINMAX_AI = 2;
+
+    private final int playerMode;
+
     private final ServerConnection connection;
     private final Board board;
     private final Scanner scanner;
     private final String playerName;
 
-    // Only applies to the first wait (after a challenge or accept).
-    // 0 means: wait without a time limit.
     private long waitTimeoutMillis;
     private String timeoutMessage;
     private long waitStartedAt;
 
-    // While true we are in a match and just wait for the server.
-    // While false we are waiting for a match to start, and the player
-    // may type 'cancel' to stop waiting.
     private boolean inMatch;
 
     private char playerSymbol;
@@ -35,7 +38,7 @@ public class GameSequence {
             Scanner scanner,
             String playerName
     ) {
-        this(connection, scanner, playerName, 0, null);
+        this(connection, scanner, playerName, 0, null, HUMAN);
     }
 
     public GameSequence(
@@ -45,12 +48,31 @@ public class GameSequence {
             long waitTimeoutMillis,
             String timeoutMessage
     ) {
+        this(
+                connection,
+                scanner,
+                playerName,
+                waitTimeoutMillis,
+                timeoutMessage,
+                HUMAN
+        );
+    }
+
+    public GameSequence(
+            ServerConnection connection,
+            Scanner scanner,
+            String playerName,
+            long waitTimeoutMillis,
+            String timeoutMessage,
+            int playerMode
+    ) {
         this.connection = connection;
         this.scanner = scanner;
         this.playerName = playerName;
         this.board = new Board();
         this.waitTimeoutMillis = waitTimeoutMillis;
         this.timeoutMessage = timeoutMessage;
+        this.playerMode = playerMode;
     }
 
     public void start() throws IOException {
@@ -58,13 +80,13 @@ public class GameSequence {
                 "Waiting for the game to start... "
                         + "(type 'cancel' to stop waiting)"
         );
+
         waitStartedAt = System.currentTimeMillis();
 
         while (true) {
             String message = nextMessage();
 
             if (message == null) {
-                // Waiting was cancelled or timed out.
                 return;
             }
 
@@ -76,10 +98,11 @@ public class GameSequence {
             System.out.println(message);
 
             if (message.startsWith("ERR")) {
-                System.out.println("Server rejected the command: " + message);
+                System.out.println(
+                        "Server rejected the command: " + message
+                );
 
                 if (!inMatch) {
-                    // Nothing is going to start, so stop waiting.
                     System.out.println("Returning to the lobby.");
                     return;
                 }
@@ -88,7 +111,10 @@ public class GameSequence {
             }
 
             if (message.contains("SVR GAME MATCH")) {
-                String firstPlayer = extractValue(message, "PLAYERTOMOVE");
+                String firstPlayer = extractValue(
+                        message,
+                        "PLAYERTOMOVE"
+                );
 
                 if (firstPlayer == null) {
                     System.out.println(
@@ -156,22 +182,15 @@ public class GameSequence {
         }
     }
 
-    /**
-     * Returns the next server message.
-     *
-     * In a match this simply blocks. Before a match (waiting for a
-     * challenge answer, an opponent or a rematch) it polls, so the
-     * player can type 'cancel' and a time limit can be applied.
-     *
-     * @return the message, or null if waiting was cancelled / timed out
-     */
     private String nextMessage() throws IOException {
         if (inMatch) {
             return connection.readResponse();
         }
 
         while (true) {
-            String message = connection.pollResponse(POLL_INTERVAL_MILLIS);
+            String message = connection.pollResponse(
+                    POLL_INTERVAL_MILLIS
+            );
 
             if (message != null) {
                 return message;
@@ -192,14 +211,13 @@ public class GameSequence {
                                 ? timeoutMessage
                                 : "No response from the server."
                 );
+
                 withdrawRequest();
                 return null;
             }
         }
     }
 
-    // Reads console input only when a line is already waiting, so the
-    // loop never blocks and keeps receiving server messages.
     private boolean playerWantsToCancel() throws IOException {
         while (System.in.available() > 0) {
             String line = scanner.nextLine().trim();
@@ -219,9 +237,6 @@ public class GameSequence {
         return false;
     }
 
-    // The protocol has no "unsubscribe" or "cancel challenge" command.
-    // Logging out and in again is the only way to make sure the server
-    // forgets the subscription or the outgoing challenge.
     private void withdrawRequest() {
         System.out.println("Withdrawing your request...");
 
@@ -235,6 +250,49 @@ public class GameSequence {
     }
 
     private void playMove() {
+        if (playerMode == HUMAN) {
+            playHumanMove();
+            return;
+        }
+
+        int[] move;
+
+        if (playerMode == RANDOM_AI) {
+            move = RandomAI.aiChoice(board);
+        } else if (playerMode == MINMAX_AI) {
+            move = MinmaxAI.bestMove(
+                    board,
+                    playerSymbol,
+                    opponentSymbol
+            );
+        } else {
+            System.out.println("Unknown player mode.");
+            connection.sendCommand("forfeit");
+            return;
+        }
+
+        if (move == null
+                || move.length < 2
+                || move[0] < 0 || move[0] > 2
+                || move[1] < 0 || move[1] > 2
+                || !board.checkMove(move[0], move[1])) {
+
+            System.out.println("AI could not find a valid move.");
+            connection.sendCommand("forfeit");
+            return;
+        }
+
+        int position = move[0] * 3 + move[1];
+
+        System.out.println(
+                "AI plays row " + (move[0] + 1)
+                        + ", column " + (move[1] + 1)
+        );
+
+        connection.sendCommand("move " + position);
+    }
+
+    private void playHumanMove() {
         board.printboard();
 
         while (true) {
@@ -250,7 +308,9 @@ public class GameSequence {
                 return;
             }
 
-            String[] coordinates = input.replace(" ", "").split(",");
+            String[] coordinates = input
+                    .replace(" ", "")
+                    .split(",");
 
             if (coordinates.length != 2) {
                 System.out.println("Invalid input. Example: 1,3");
@@ -261,7 +321,8 @@ public class GameSequence {
                 int row = Integer.parseInt(coordinates[0]) - 1;
                 int column = Integer.parseInt(coordinates[1]) - 1;
 
-                if (row < 0 || row > 2 || column < 0 || column > 2) {
+                if (row < 0 || row > 2
+                        || column < 0 || column > 2) {
                     System.out.println(
                             "Enter row and column numbers from 1 to 3."
                     );
@@ -269,7 +330,9 @@ public class GameSequence {
                 }
 
                 if (!board.checkMove(row, column)) {
-                    System.out.println("That position is already occupied.");
+                    System.out.println(
+                            "That position is already occupied."
+                    );
                     continue;
                 }
 
@@ -296,7 +359,9 @@ public class GameSequence {
             int position = Integer.parseInt(serverMove);
 
             if (position < 0 || position > 8) {
-                System.out.println("Invalid move received from server.");
+                System.out.println(
+                        "Invalid move received from server."
+                );
                 return;
             }
 
@@ -334,10 +399,12 @@ public class GameSequence {
             if (choice.equals("1")) {
                 board.clearBoard();
                 connection.sendCommand("subscribe tic-tac-toe");
+
                 System.out.println(
                         "Searching for another opponent... "
                                 + "(type 'cancel' to stop searching)"
                 );
+
                 waitStartedAt = System.currentTimeMillis();
                 return true;
 
@@ -346,7 +413,9 @@ public class GameSequence {
                 return false;
 
             } else {
-                System.out.println("Invalid option. Enter 1 or 2.");
+                System.out.println(
+                        "Invalid option. Enter 1 or 2."
+                );
             }
         }
     }
