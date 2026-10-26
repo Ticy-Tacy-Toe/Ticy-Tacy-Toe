@@ -1,4 +1,3 @@
-
 package TicyTacyToe.Server;
 
 import java.io.IOException;
@@ -12,9 +11,13 @@ public class ServerGame {
     private final Scanner scanner;
     private final String playerName;
 
-    private String gameType = "tic-tac-toe";
+    private final String gameType = "tic-tac-toe";
 
-    public ServerGame(ServerConnection connection, Scanner scanner, String playerName) {
+    public ServerGame(
+            ServerConnection connection,
+            Scanner scanner,
+            String playerName
+    ) {
         this.connection = connection;
         this.scanner = scanner;
         this.playerName = playerName;
@@ -69,19 +72,39 @@ public class ServerGame {
             return;
         }
 
-        System.out.println("Player: " +
-                (challenger != null ? challenger : "Unknown"));
-        System.out.print("Accept challenge? (yes/no): ");
+        System.out.println(
+                "Player: " + (challenger == null ? "Unknown" : challenger)
+        );
 
+        System.out.print("Accept challenge? (yes/no): ");
         String answer = scanner.nextLine().trim();
 
         if (answer.equalsIgnoreCase("yes")
                 || answer.equalsIgnoreCase("y")) {
+
             connection.sendCommand("challenge accept " + challengeNumber);
             System.out.println("Challenge accepted.");
+
             waitForGame();
+
         } else {
             System.out.println("Challenge declined.");
+        }
+    }
+
+    private void waitForGame() {
+        System.out.println("Waiting for the server to start the game...");
+
+        try {
+            GameSequence gameSequence =
+                    new GameSequence(connection, scanner, playerName);
+
+            gameSequence.start();
+
+        } catch (IOException e) {
+            System.out.println(
+                    "Error during the online game: " + e.getMessage()
+            );
         }
     }
 
@@ -99,20 +122,4 @@ public class ServerGame {
 
         return null;
     }
-
-
-    private void waitForGame() {
-        System.out.println("Waiting for the server to start the game...");
-
-        try {
-            GameSequence gameSequence =
-                    new GameSequence(connection, scanner, playerName);
-
-            gameSequence.start();
-
-        } catch (IOException e) {
-            System.out.println("Error during the online game: " + e.getMessage());
-        }
-    }
-
 }

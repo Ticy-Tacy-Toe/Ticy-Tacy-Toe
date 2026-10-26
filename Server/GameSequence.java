@@ -36,7 +36,7 @@ public class GameSequence {
 
             if (message.equals(ServerConnection.CONNECTION_LOST)) {
                 if (reconnect()) {
-                    continue;
+                    return;
                 }
                 return;
             }
@@ -52,7 +52,9 @@ public class GameSequence {
                 String firstPlayer = extractValue(message, "PLAYERTOMOVE");
 
                 if (firstPlayer == null) {
-                    System.out.println("Could not determine the first player.");
+                    System.out.println(
+                            "Could not determine the first player."
+                    );
                     continue;
                 }
 
@@ -64,9 +66,10 @@ public class GameSequence {
                     opponentSymbol = 'X';
                 }
 
+                board.clearBoard();
+
                 System.out.println("Match started!");
                 System.out.println("Your symbol: " + playerSymbol);
-                board.clearBoard();
                 board.printboard();
 
             } else if (message.contains("SVR GAME YOURTURN")) {
@@ -78,17 +81,32 @@ public class GameSequence {
             } else if (message.contains("SVR GAME WIN")) {
                 System.out.println("You won!");
                 board.printboard();
-                returnToLobbyOrRematch();
+
+                if (returnToLobbyOrRematch()) {
+                    continue;
+                }
+
+                return;
 
             } else if (message.contains("SVR GAME LOSS")) {
                 System.out.println("You lost!");
                 board.printboard();
-                returnToLobbyOrRematch();
+
+                if (returnToLobbyOrRematch()) {
+                    continue;
+                }
+
+                return;
 
             } else if (message.contains("SVR GAME DRAW")) {
                 System.out.println("The game is a draw!");
                 board.printboard();
-                returnToLobbyOrRematch();
+
+                if (returnToLobbyOrRematch()) {
+                    continue;
+                }
+
+                return;
             }
         }
     }
@@ -121,7 +139,9 @@ public class GameSequence {
                 int column = Integer.parseInt(coordinates[1]) - 1;
 
                 if (row < 0 || row > 2 || column < 0 || column > 2) {
-                    System.out.println("Enter row and column numbers from 1 to 3.");
+                    System.out.println(
+                            "Enter row and column numbers from 1 to 3."
+                    );
                     continue;
                 }
 
@@ -179,7 +199,7 @@ public class GameSequence {
         }
     }
 
-    private void returnToLobbyOrRematch() {
+    private boolean returnToLobbyOrRematch() {
         System.out.println("\n=== Match Finished ===");
         System.out.println("1. Rematch (find another opponent)");
         System.out.println("2. Return to lobby");
@@ -192,11 +212,11 @@ public class GameSequence {
                 board.clearBoard();
                 connection.sendCommand("subscribe tic-tac-toe");
                 System.out.println("Searching for another opponent...");
-                return;
+                return true;
 
             } else if (choice.equals("2")) {
                 System.out.println("Returning to the lobby...");
-                return;
+                return false;
 
             } else {
                 System.out.println("Invalid option. Enter 1 or 2.");
@@ -215,12 +235,10 @@ public class GameSequence {
             return false;
         }
 
-        System.out.println("Reconnecting...");
-
         if (connection.reconnect(playerName)) {
             System.out.println("Reconnected to the server.");
             System.out.println(
-                    "Restoring the previous match depends on server support."
+                    "The previous match may not be recoverable."
             );
             return true;
         }

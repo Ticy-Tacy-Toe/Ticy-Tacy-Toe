@@ -29,7 +29,6 @@ public class ServerConnection {
 
     public synchronized boolean connectServer(String playerName) {
         closeSocket();
-
         responses.clear();
         manuallyDisconnected = false;
 
@@ -43,19 +42,16 @@ public class ServerConnection {
             );
 
             PrintWriter newOut = new PrintWriter(
-                    newSocket.getOutputStream(),
-                    true
+                    newSocket.getOutputStream(), true
             );
 
             System.out.println("Connected to the game server.");
-
             System.out.println(newIn.readLine());
             System.out.println(newIn.readLine());
 
             newOut.println("login " + playerName);
 
             String response = newIn.readLine();
-
             System.out.println("Login response: " + response);
 
             if (response == null || !response.equalsIgnoreCase("OK")) {
@@ -75,7 +71,8 @@ public class ServerConnection {
                     () -> listenForMessages(
                             connectedReader,
                             connectedSocket
-                    )
+                    ),
+                    "Server-Message-Listener"
             );
 
             listener.setDaemon(true);
@@ -88,7 +85,6 @@ public class ServerConnection {
                     "Could not connect to the game server at "
                             + SERVER_IP + ":" + SERVER_PORT
             );
-
             System.out.println(
                     "Check that the server is running and the IP is correct."
             );
@@ -99,7 +95,7 @@ public class ServerConnection {
                 try {
                     newSocket.close();
                 } catch (IOException ignored) {
-                    // The socket may already be closed.
+                    // Socket already closed.
                 }
             }
 
@@ -120,11 +116,22 @@ public class ServerConnection {
             String message;
 
             while ((message = reader.readLine()) != null) {
+                System.out.println("[SERVER] " + message);
+
                 if (message.contains("SVR GAME CHALLENGE")) {
                     Consumer<String> handler = challengeHandler;
 
                     if (handler != null) {
-                        handler.accept(message);
+                        String challenge = message;
+
+                        // Never block the socket listener with user input.
+                        Thread challengeThread = new Thread(
+                                () -> handler.accept(challenge),
+                                "Incoming-Challenge"
+                        );
+
+                        challengeThread.setDaemon(true);
+                        challengeThread.start();
                     } else {
                         responses.offer(message);
                     }
@@ -134,7 +141,7 @@ public class ServerConnection {
             }
 
         } catch (IOException e) {
-            // The connection may have been closed intentionally.
+            // The connection may have closed.
         } finally {
             if (!manuallyDisconnected && socket == connectedSocket) {
                 responses.offer(CONNECTION_LOST);
@@ -146,15 +153,20 @@ public class ServerConnection {
         this.challengeHandler = handler;
     }
 
-    public void sendCommand(String command) {
-        if (out != null && socket != null && socket.isConnected()
-                && !socket.isClosed()) {
-            out.println(command);
+    public synchronized void sendCommand(String command) {
+        if (out == null || socket == null
+                || socket.isClosed() || !socket.isConnected()) {
+            System.out.println(
+                    "Cannot send command: not connected to the server."
+            );
+            responses.offer(CONNECTION_LOST);
+            return;
+        }
 
-            if (out.checkError()) {
-                responses.offer(CONNECTION_LOST);
-            }
-        } else {
+        System.out.println("[CLIENT] " + command);
+        out.println(command);
+
+        if (out.checkError()) {
             responses.offer(CONNECTION_LOST);
         }
     }
@@ -166,8 +178,7 @@ public class ServerConnection {
             Thread.currentThread().interrupt();
 
             throw new IOException(
-                    "Interrupted while waiting for server response.",
-                    e
+                    "Interrupted while waiting for server response.", e
             );
         }
     }

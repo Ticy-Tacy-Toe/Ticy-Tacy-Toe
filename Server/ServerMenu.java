@@ -1,4 +1,3 @@
-
 package TicyTacyToe.Server;
 
 import java.util.Scanner;
@@ -8,9 +7,15 @@ public class ServerMenu {
     private final ServerGame serverGame;
     private final Scanner scanner;
 
-    public ServerMenu(ServerConnection connection, Scanner scanner, String playerName) {
+    public ServerMenu(
+            ServerConnection connection,
+            Scanner scanner,
+            String playerName
+    ) {
         this.scanner = scanner;
-        this.serverGame = new ServerGame(connection, scanner, playerName);
+        this.serverGame = new ServerGame(
+                connection, scanner, playerName
+        );
     }
 
     public void start() {
@@ -23,7 +28,7 @@ public class ServerMenu {
             System.out.println("3. Back");
             System.out.print("Choose an option: ");
 
-            String choice = scanner.nextLine();
+            String choice = scanner.nextLine().trim();
 
             switch (choice) {
                 case "1":
