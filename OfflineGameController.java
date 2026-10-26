@@ -159,14 +159,14 @@ public class OfflineGameController {
     }
 
     private static boolean isGameOver(Board board) {
-        return checkWin(board) || board.checkFull();
+        return hasWon(board) || board.checkFull();
     }
 
     private static int switchPlayer(int player) {
         return (player == 1) ? 2 : 1;
     }
 
-    private static boolean checkWin(Board board) {
+    private static boolean hasWon(Board board) {
         return board.checkRow()
                 || board.checkColumn()
                 || board.checkDiagonal();
@@ -180,7 +180,7 @@ public class OfflineGameController {
             Scanner scanner,
             int aiOption
     ) {
-        if (board.checkFull() && !checkWin(board)) {
+        if (board.checkFull() && !hasWon(board)) {
             CLI.printGameResult("Board is full - draw!");
         } else if (aiOption == 3) {
             Player winningPlayer = (winner == 1)
