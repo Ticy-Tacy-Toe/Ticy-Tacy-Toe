@@ -7,12 +7,16 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class ServerConnection {
 
     private static final String SERVER_IP = "10.243.200.90";
     private static final int SERVER_PORT = 7789;
+
+    private static final int RESTART_ATTEMPTS = 3;
+    private static final long RESTART_DELAY_MILLIS = 500;
 
     public static final String CONNECTION_LOST = "CONNECTION_LOST";
 
@@ -108,6 +112,37 @@ public class ServerConnection {
         return connectServer(playerName);
     }
 
+    /**
+     * Drops the current connection on purpose and logs in again with the
+     * same name.
+     *
+     * The protocol has no "unsubscribe" or "cancel challenge" command.
+     * Disconnecting is the only way to withdraw a subscription or an
+     * outgoing challenge. Because disconnect() marks the drop as manual,
+     * the old listener thread does not report CONNECTION_LOST.
+     *
+     * The server may need a moment to notice the closed socket, so the
+     * login is retried a few times (a name must be unique on the server).
+     */
+    public synchronized boolean restart(String playerName) {
+        disconnect();
+
+        for (int attempt = 1; attempt <= RESTART_ATTEMPTS; attempt++) {
+            try {
+                Thread.sleep(RESTART_DELAY_MILLIS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+
+            if (connectServer(playerName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void listenForMessages(
             BufferedReader reader,
             Socket connectedSocket
@@ -174,6 +209,23 @@ public class ServerConnection {
     public String readResponse() throws IOException {
         try {
             return responses.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+
+            throw new IOException(
+                    "Interrupted while waiting for server response.", e
+            );
+        }
+    }
+
+    /**
+     * Like readResponse(), but gives up after the timeout.
+     *
+     * @return the next message, or null if none arrived in time
+     */
+    public String pollResponse(long timeoutMillis) throws IOException {
+        try {
+            return responses.poll(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
 

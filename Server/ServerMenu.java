@@ -25,7 +25,11 @@ public class ServerMenu {
             System.out.println("\n=== Online Tic-Tac-Toe ===");
             System.out.println("1. Find a game");
             System.out.println("2. Challenge a player");
-            System.out.println("3. Back");
+            System.out.println(
+                    "3. Incoming challenges ("
+                            + serverGame.pendingChallengeCount() + ")"
+            );
+            System.out.println("4. Back");
             System.out.print("Choose an option: ");
 
             String choice = scanner.nextLine().trim();
@@ -40,6 +44,10 @@ public class ServerMenu {
                     break;
 
                 case "3":
+                    serverGame.handleIncomingChallenges();
+                    break;
+
+                case "4":
                     running = false;
                     break;
 
