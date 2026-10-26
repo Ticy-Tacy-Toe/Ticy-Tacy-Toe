@@ -10,18 +10,34 @@ import TicyTacyToe.Players.Player;
 
 import java.util.Scanner;
 
-public class GameSequence {
+public class OfflineGameController {
 
     public static void run(Board board, Scanner scanner) {
         Player humanPlayer = new HumanPlayer(scanner, 2);
-        Player aiPlayer = createAIPlayer(humanPlayer);
 
         int aiOption = CLI.chooseAI(scanner);
+
+        Player secondPlayer;
+
+        if (aiOption == 3) {
+            secondPlayer = new HumanPlayer(scanner, 1);
+        } else {
+            secondPlayer = createAIPlayer(humanPlayer);
+        }
+
         int currentPlayer = 1;
         boolean gameOver = false;
 
         while (!gameOver) {
-            playTurn(board, humanPlayer, aiPlayer, aiOption, currentPlayer, scanner);
+            playTurn(
+                    board,
+                    humanPlayer,
+                    secondPlayer,
+                    aiOption,
+                    currentPlayer,
+                    scanner
+            );
+
             board.printboard();
 
             if (isGameOver(board)) {
@@ -29,13 +45,15 @@ public class GameSequence {
                         currentPlayer,
                         board,
                         humanPlayer,
-                        aiPlayer,
-                        scanner
+                        secondPlayer,
+                        scanner,
+                        aiOption
                 );
 
                 if (!gameOver) {
                     board.clearBoard();
                     board.printboard();
+                    currentPlayer = 1;
                 }
             } else {
                 currentPlayer = switchPlayer(currentPlayer);
@@ -51,13 +69,22 @@ public class GameSequence {
     private static void playTurn(
             Board board,
             Player humanPlayer,
-            Player aiPlayer,
+            Player secondPlayer,
             int aiOption,
             int currentPlayer,
             Scanner scanner
     ) {
         if (currentPlayer == 1) {
-            playAITurn(board, aiPlayer, humanPlayer, aiOption, scanner);
+            if (aiOption == 3) {
+                playHumanTurn(board, secondPlayer, scanner);
+            } else {
+                playAITurn(
+                        board,
+                        secondPlayer,
+                        humanPlayer,
+                        aiOption
+                );
+            }
         } else {
             playHumanTurn(board, humanPlayer, scanner);
         }
@@ -67,8 +94,7 @@ public class GameSequence {
             Board board,
             Player aiPlayer,
             Player humanPlayer,
-            int aiOption,
-            Scanner scanner
+            int aiOption
     ) {
         boolean validMove = false;
 
@@ -77,11 +103,12 @@ public class GameSequence {
                     board,
                     aiPlayer,
                     humanPlayer,
-                    aiOption,
-                    scanner
+                    aiOption
             );
 
-            if (board.checkMove(move[0], move[1])) {
+            if (move != null
+                    && move.length >= 2
+                    && board.checkMove(move[0], move[1])) {
                 board.doMove(move, aiPlayer.getSymbol());
                 validMove = true;
             }
@@ -94,28 +121,26 @@ public class GameSequence {
             Board board,
             Player aiPlayer,
             Player humanPlayer,
-            int aiOption,
-            Scanner scanner
+            int aiOption
     ) {
         if (aiOption == 1) {
             return RandomAI.aiChoice(board);
-        } 
-        if (aiOption == 2){
-        return MinmaxAI.bestMove(
-                board,
-                aiPlayer.getSymbol(),
-                humanPlayer
-        );
-        } 
-        else{
-            int[] move = secondPlayer(board,scanner);
-            return move;
         }
+
+        if (aiOption == 2) {
+            return MinmaxAI.bestMove(
+                    board,
+                    aiPlayer.getSymbol(),
+                    humanPlayer
+            );
+        }
+
+        return null;
     }
 
     private static void playHumanTurn(
             Board board,
-            Player humanPlayer,
+            Player player,
             Scanner scanner
     ) {
         boolean validMove = false;
@@ -125,7 +150,7 @@ public class GameSequence {
             int[] result = move.getMove();
 
             if (board.checkMove(result[0], result[1])) {
-                board.doMove(result, humanPlayer.getSymbol());
+                board.doMove(result, player.getSymbol());
                 validMove = true;
             } else {
                 CLI.invalidMove();
@@ -151,54 +176,44 @@ public class GameSequence {
             int winner,
             Board board,
             Player humanPlayer,
-            Player aiPlayer,
-            Scanner scanner
+            Player secondPlayer,
+            Scanner scanner,
+            int aiOption
     ) {
         if (board.checkFull() && !checkWin(board)) {
             CLI.printGameResult("Board is full - draw!");
+        } else if (aiOption == 3) {
+            Player winningPlayer = (winner == 1)
+                    ? secondPlayer
+                    : humanPlayer;
+
+            winningPlayer.addPoint();
+
+            CLI.printGameResult(
+                    winningPlayer.getName() + " has won!"
+            );
         } else if (winner == 2) {
             humanPlayer.addPoint();
-            CLI.printGameResult("you have won!");
+            CLI.printGameResult("You have won!");
         } else {
-            aiPlayer.addPoint();
-            CLI.printGameResult("you lost :(");
+            secondPlayer.addPoint();
+            CLI.printGameResult("You lost :(");
         }
 
-        printScores(humanPlayer, aiPlayer);
+        printScores(humanPlayer, secondPlayer);
 
         return !CLI.wantsToPlayAgain(scanner);
     }
 
     private static void printScores(
             Player humanPlayer,
-            Player aiPlayer
+            Player secondPlayer
     ) {
         CLI.printScores(
                 humanPlayer.getName(),
                 humanPlayer.getScore(),
-                aiPlayer.getName(),
-                aiPlayer.getScore()
+                secondPlayer.getName(),
+                secondPlayer.getScore()
         );
     }
-
-    private static int[] secondPlayer(
-        Board board,
-        Scanner scanner
-) {
-    boolean validMove = false;
-    int[] result = null;
-
-    while (!validMove) {
-        Move move = new Move(scanner);
-        result = move.getMove();
-
-        if (board.checkMove(result[0], result[1])) {
-             validMove = true;
-        } else {
-             CLI.invalidMove();
-        }
-    }
-    
-    return result;
-}
 }
