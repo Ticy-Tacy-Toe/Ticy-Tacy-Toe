@@ -1,11 +1,12 @@
+
 package TicyTacyToe;
 
 import java.util.Scanner;
 import TicyTacyToe.CLI.CLI;
-
 import TicyTacyToe.Server.*;
 
 public class Main {
+
     public static void main(String[] args) {
 
         Board board = new Board();
@@ -22,21 +23,19 @@ public class Main {
             ServerConnection connection = new ServerConnection();
 
             if (connection.connectServer(playerName)) {
-                ServerGame serverGame =
-                        new ServerGame(connection, scanner, playerName);
+                ServerMenu serverMenu =
+                        new ServerMenu(connection, scanner, playerName);
 
-                serverGame.start();
+                serverMenu.start();
             } else {
                 System.out.println("Could not log in to the game server.");
             }
 
             connection.disconnect();
+
         } else {
             GameSequence.run(board, scanner);
             board.printboard();
         }
-
-
     }
-
 }

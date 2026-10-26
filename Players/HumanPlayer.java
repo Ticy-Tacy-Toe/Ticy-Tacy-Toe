@@ -50,7 +50,7 @@ public class HumanPlayer extends Player {
 
     @Override 
     public int[] makeMove(Board board) {
-        Move move = new Move();
+        Move move = new Move(scanner);
         return move.getMove();
     }
 

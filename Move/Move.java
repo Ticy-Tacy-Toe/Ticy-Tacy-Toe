@@ -1,14 +1,18 @@
+
 package TicyTacyToe.Move;
 
 import java.util.Scanner;
 
 public class Move implements MoverInterface {
 
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
+
+    public Move(Scanner scanner) {
+        this.scanner = scanner;
+    }
 
     @Override
     public int[] getMove() {
-
         while (true) {
             System.out.print("Enter move (row, column): example: 1, 3 ");
 
@@ -21,11 +25,12 @@ public class Move implements MoverInterface {
                     int row = Integer.parseInt(input[0]);
                     int column = Integer.parseInt(input[1]);
 
-                    if (row > 0 && row <= 3 && column > 0 && column <=3) {
+                    if (row >= 1 && row <= 3
+                            && column >= 1 && column <= 3) {
                         return new int[]{row - 1, column - 1};
                     }
                 } catch (NumberFormatException ignored) {
-                    // Input wasn't a number.
+                    // Invalid input.
                 }
             }
 

@@ -1,5 +1,7 @@
+
 package TicyTacyToe.Server;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +13,6 @@ public class ServerGame {
     private final String playerName;
 
     private String gameType = "tic-tac-toe";
-    private boolean gameStarted = false;
 
     public ServerGame(ServerConnection connection, Scanner scanner, String playerName) {
         this.connection = connection;
@@ -21,50 +22,13 @@ public class ServerGame {
         connection.setChallengeHandler(this::receiveChallenge);
     }
 
-    public void start() {
-        boolean running = true;
-
-        while (running) {
-            System.out.println("\n=== Online Tic-Tac-Toe ===");
-            System.out.println("1. Find a game");
-            System.out.println("2. Challenge a player");
-            System.out.println("3. Show supported game types");
-            System.out.println("4. Back");
-            System.out.print("Choose an option: ");
-
-            String choice = scanner.nextLine();
-
-            switch (choice) {
-                case "1":
-                    findGame();
-                    break;
-
-                case "2":
-                    challengePlayer();
-                    break;
-
-                case "3":
-                    showGameTypes();
-                    break;
-
-                case "4":
-                    running = false;
-                    break;
-
-                default:
-                    System.out.println("Invalid option.");
-                    break;
-            }
-        }
-    }
-
-    private void findGame() {
+    public void findGame() {
         System.out.println("Searching for an opponent...");
         connection.sendCommand("subscribe " + gameType);
         waitForGame();
     }
 
-    private void challengePlayer() {
+    public void challengePlayer() {
         System.out.print("Enter the opponent's player name: ");
         String opponentName = scanner.nextLine().trim();
 
@@ -84,11 +48,6 @@ public class ServerGame {
 
         System.out.println("Challenge sent to " + opponentName + ".");
         waitForGame();
-    }
-
-    private void showGameTypes() {
-        System.out.println("Requesting supported game types...");
-        connection.sendCommand("get gamelist");
     }
 
     private void receiveChallenge(String message) {
@@ -141,8 +100,19 @@ public class ServerGame {
         return null;
     }
 
+
     private void waitForGame() {
         System.out.println("Waiting for the server to start the game...");
-        System.out.println("Return to the game menu when the match begins.");
+
+        try {
+            GameSequence gameSequence =
+                    new GameSequence(connection, scanner, playerName);
+
+            gameSequence.start();
+
+        } catch (IOException e) {
+            System.out.println("Error during the online game: " + e.getMessage());
+        }
     }
+
 }

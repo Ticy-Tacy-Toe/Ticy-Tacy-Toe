@@ -21,7 +21,7 @@ public class GameSequence {
         boolean gameOver = false;
 
         while (!gameOver) {
-            playTurn(board, humanPlayer, aiPlayer, aiOption, currentPlayer);
+            playTurn(board, humanPlayer, aiPlayer, aiOption, currentPlayer, scanner);
             board.printboard();
 
             if (isGameOver(board)) {
@@ -53,12 +53,13 @@ public class GameSequence {
             Player humanPlayer,
             Player aiPlayer,
             int aiOption,
-            int currentPlayer
+            int currentPlayer,
+            Scanner scanner
     ) {
         if (currentPlayer == 1) {
             playAITurn(board, aiPlayer, humanPlayer, aiOption);
         } else {
-            playHumanTurn(board, humanPlayer);
+            playHumanTurn(board, humanPlayer, scanner);
         }
     }
 
@@ -106,12 +107,13 @@ public class GameSequence {
 
     private static void playHumanTurn(
             Board board,
-            Player humanPlayer
+            Player humanPlayer,
+            Scanner scanner
     ) {
         boolean validMove = false;
 
         while (!validMove) {
-            Move move = new Move();
+            Move move = new Move(scanner);
             int[] result = move.getMove();
 
             if (board.checkMove(result[0], result[1])) {
