@@ -2,7 +2,7 @@ package TicyTacyToe;
 
 import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
-import TicyTacyToe.CLI.CLI;
+import TicyTacyToe.CLI.CLIstartUp;
 import TicyTacyToe.Move.*;
 import TicyTacyToe.Players.AIPlayer;
 import TicyTacyToe.Players.HumanPlayer;
@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class OfflineGameController {
 
     public static void run(Board board, Scanner scanner) {
-        int aiOption = CLI.chooseAI(scanner);
+        int aiOption = CLIstartUp.chooseAI(scanner);
 
         Player humanPlayer;
         Player secondPlayer;
@@ -161,7 +161,7 @@ public class OfflineGameController {
                 board.doMove(result, player.getSymbol());
                 validMove = true;
             } else {
-                CLI.invalidMove();
+                CLIstartUp.invalidMove();
             }
         }
     }
@@ -189,7 +189,7 @@ public class OfflineGameController {
             int aiOption
     ) {
         if (board.checkFull() && !hasWon(board)) {
-            CLI.printGameResult("Board is full - draw!");
+            CLIstartUp.printGameResult("Board is full - draw!");
         } else if (aiOption == 3) {
             Player winningPlayer = (winner == 1)
                     ? secondPlayer
@@ -197,27 +197,27 @@ public class OfflineGameController {
 
             winningPlayer.addPoint();
 
-            CLI.printGameResult(
+            CLIstartUp.printGameResult(
                     winningPlayer.getName() + " has won!"
             );
         } else if (winner == 2) {
             humanPlayer.addPoint();
-            CLI.printGameResult("You have won!");
+            CLIstartUp.printGameResult("You have won!");
         } else {
             secondPlayer.addPoint();
-            CLI.printGameResult("You lost :(");
+            CLIstartUp.printGameResult("You lost :(");
         }
 
         printScores(humanPlayer, secondPlayer);
 
-        return !CLI.wantsToPlayAgain(scanner);
+        return !CLIstartUp.wantsToPlayAgain(scanner);
     }
 
     private static void printScores(
             Player humanPlayer,
             Player secondPlayer
     ) {
-        CLI.printScores(
+        CLIstartUp.printScores(
                 humanPlayer.getName(),
                 humanPlayer.getScore(),
                 secondPlayer.getName(),

@@ -1,3 +1,4 @@
+
 package TicyTacyToe.Server;
 
 import java.io.IOException;
@@ -6,10 +7,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ServerGame {
+public class OnlineGameController {
 
     private static final long CHALLENGE_TIMEOUT_MILLIS = 30_000;
     private static final long ACCEPT_TIMEOUT_MILLIS = 15_000;
@@ -18,61 +20,61 @@ public class ServerGame {
     private final Scanner scanner;
     private final String playerName;
     private final int playerMode;
+    private final Consumer<String> notificationHandler;
 
     private final String gameType = "tic-tac-toe";
 
     private final List<IncomingChallenge> pendingChallenges =
             new CopyOnWriteArrayList<>();
 
-    private static class IncomingChallenge {
+    public static class IncomingChallenge {
+
         private final String number;
         private final String challenger;
 
-        private IncomingChallenge(String number, String challenger) {
+        public IncomingChallenge(String number, String challenger) {
             this.number = number;
             this.challenger = challenger;
         }
+
+        public String getNumber() {
+            return number;
+        }
+
+        public String getChallenger() {
+            return challenger;
+        }
     }
 
-    public ServerGame(
+    public OnlineGameController(
             ServerConnection connection,
             Scanner scanner,
             String playerName,
-            int playerMode
+            int playerMode,
+            Consumer<String> notificationHandler
     ) {
         this.connection = connection;
         this.scanner = scanner;
         this.playerName = playerName;
         this.playerMode = playerMode;
+        this.notificationHandler = notificationHandler;
 
         connection.setChallengeHandler(this::receiveChallenge);
     }
 
+    public boolean isOwnName(String name) {
+        return name.equalsIgnoreCase(playerName);
+    }
+
     public void findGame() {
-        System.out.println("Searching for an opponent...");
         connection.sendCommand("subscribe " + gameType);
         waitForGame(0, null);
     }
 
-    public void challengePlayer() {
-        System.out.print("Enter the opponent's player name: ");
-        String opponentName = scanner.nextLine().trim();
-
-        if (opponentName.isEmpty()) {
-            System.out.println("Player name cannot be empty.");
-            return;
-        }
-
-        if (opponentName.equalsIgnoreCase(playerName)) {
-            System.out.println("You cannot challenge yourself.");
-            return;
-        }
-
+    public void challengePlayer(String opponentName) {
         connection.sendCommand(
                 "challenge \"" + opponentName + "\" \"" + gameType + "\""
         );
-
-        System.out.println("Challenge sent to " + opponentName + ".");
 
         waitForGame(
                 CHALLENGE_TIMEOUT_MILLIS,
@@ -86,63 +88,49 @@ public class ServerGame {
         return pendingChallenges.size();
     }
 
-    public void handleIncomingChallenges() {
-        if (pendingChallenges.isEmpty()) {
-            System.out.println("No incoming challenges.");
+    public List<IncomingChallenge> getPendingChallenges() {
+        return new ArrayList<>(pendingChallenges);
+    }
+
+    public void acceptChallenge(String challengeNumber) {
+        IncomingChallenge challenge = findChallenge(challengeNumber);
+
+        if (challenge == null) {
+            notificationHandler.accept(
+                    "This challenge is no longer available."
+            );
             return;
         }
 
-        for (IncomingChallenge challenge :
-                new ArrayList<>(pendingChallenges)) {
+        pendingChallenges.remove(challenge);
 
-            if (!pendingChallenges.contains(challenge)) {
-                continue;
-            }
+        connection.sendCommand("challenge accept " + challengeNumber);
 
-            System.out.println(
-                    "\nChallenge from " + challenge.challenger
-                            + " (#" + challenge.number + ")"
-            );
+        notificationHandler.accept("Challenge accepted.");
 
-            System.out.print(
-                    "y = accept, n = decline, Enter = decide later: "
-            );
+        waitForGame(
+                ACCEPT_TIMEOUT_MILLIS,
+                "The game did not start. "
+                        + "The challenge may no longer be valid."
+        );
+    }
 
-            String answer = scanner.nextLine().trim();
+    public void declineChallenge(String challengeNumber) {
+        IncomingChallenge challenge = findChallenge(challengeNumber);
 
-            if (answer.equalsIgnoreCase("y")
-                    || answer.equalsIgnoreCase("yes")) {
+        if (challenge != null) {
+            pendingChallenges.remove(challenge);
+        }
+    }
 
-                pendingChallenges.remove(challenge);
-
-                connection.sendCommand(
-                        "challenge accept " + challenge.number
-                );
-
-                System.out.println("Challenge accepted.");
-
-                waitForGame(
-                        ACCEPT_TIMEOUT_MILLIS,
-                        "The game did not start. "
-                                + "The challenge may no longer be valid."
-                );
-
-                return;
-
-            } else if (answer.equalsIgnoreCase("n")
-                    || answer.equalsIgnoreCase("no")) {
-
-                pendingChallenges.remove(challenge);
-
-                System.out.println(
-                        "Challenge from " + challenge.challenger
-                                + " declined."
-                );
-
-            } else {
-                System.out.println("Challenge left open.");
+    private IncomingChallenge findChallenge(String challengeNumber) {
+        for (IncomingChallenge challenge : pendingChallenges) {
+            if (challenge.getNumber().equals(challengeNumber)) {
+                return challenge;
             }
         }
+
+        return null;
     }
 
     private void receiveChallenge(String message) {
@@ -161,24 +149,23 @@ public class ServerGame {
         String receivedGameType = extractValue(message, "GAMETYPE");
 
         if (challengeNumber == null) {
-            System.out.println(
-                    "\nReceived a challenge without a number."
+            notificationHandler.accept(
+                    "Received a challenge without a number."
             );
             return;
         }
 
         if (receivedGameType != null
                 && !receivedGameType.equalsIgnoreCase(gameType)) {
-
-            System.out.println(
-                    "\nIgnored a challenge for another game ("
+            notificationHandler.accept(
+                    "Ignored a challenge for another game ("
                             + receivedGameType + ")."
             );
             return;
         }
 
         for (IncomingChallenge existing : pendingChallenges) {
-            if (existing.number.equals(challengeNumber)) {
+            if (existing.getNumber().equals(challengeNumber)) {
                 return;
             }
         }
@@ -189,10 +176,9 @@ public class ServerGame {
                 new IncomingChallenge(challengeNumber, name)
         );
 
-        System.out.println(
-                "\n>> " + name + " challenged you! Open 'Incoming "
-                        + "challenges' in the menu to accept or decline, "
-                        + "or just ignore it."
+        notificationHandler.accept(
+                ">> " + name + " challenged you! Open 'Incoming challenges' "
+                        + "in the menu to accept or decline, or just ignore it."
         );
     }
 
@@ -202,11 +188,12 @@ public class ServerGame {
         }
 
         for (IncomingChallenge challenge : pendingChallenges) {
-            if (challenge.number.equals(challengeNumber)) {
+            if (challenge.getNumber().equals(challengeNumber)) {
                 pendingChallenges.remove(challenge);
 
-                System.out.println(
-                        "\n>> The challenge from " + challenge.challenger
+                notificationHandler.accept(
+                        ">> The challenge from "
+                                + challenge.getChallenger()
                                 + " was withdrawn."
                 );
 
@@ -232,7 +219,7 @@ public class ServerGame {
             gameSequence.start();
 
         } catch (IOException e) {
-            System.out.println(
+            notificationHandler.accept(
                     "Error during the online game: " + e.getMessage()
             );
         }
@@ -254,11 +241,6 @@ public class ServerGame {
     }
 
     public void waitForTournamentMatch() {
-        System.out.println("Waiting for a tournament match...");
-        System.out.println(
-                "The tournament server must assign your match."
-        );
-
         waitForGame(0, null);
     }
 }

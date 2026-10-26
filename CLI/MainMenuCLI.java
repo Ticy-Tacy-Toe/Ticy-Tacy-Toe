@@ -1,13 +1,14 @@
 package TicyTacyToe.CLI.MainMenuCLI;
 
+import TicyTacyToe.CLI.ServerGameCLI.ServerGameCLI;
+import TicyTacyToe.Server.OnlineGameController;
 import TicyTacyToe.Server.ServerConnection;
-import TicyTacyToe.Server.ServerGame;
 
 import java.util.Scanner;
 
 public class MainMenuCLI {
 
-    private final ServerGame serverGame;
+    private final ServerGameCLI serverGameCLI;
     private final Scanner scanner;
 
     public MainMenuCLI(
@@ -18,11 +19,18 @@ public class MainMenuCLI {
     ) {
         this.scanner = scanner;
 
-        this.serverGame = new ServerGame(
-                connection,
-                scanner,
-                playerName,
-                playerMode
+        OnlineGameController gameController =
+                new OnlineGameController(
+                        connection,
+                        scanner,
+                        playerName,
+                        playerMode,
+                        message -> System.out.println("\n" + message)
+                );
+
+        this.serverGameCLI = new ServerGameCLI(
+                gameController,
+                scanner
         );
     }
 
@@ -35,7 +43,7 @@ public class MainMenuCLI {
             System.out.println("2. Challenge a player");
             System.out.println(
                     "3. Incoming challenges ("
-                            + serverGame.pendingChallengeCount() + ")"
+                            + serverGameCLI.pendingChallengeCount() + ")"
             );
             System.out.println("4. Wait for tournament match");
             System.out.println("5. Back");
@@ -45,19 +53,19 @@ public class MainMenuCLI {
 
             switch (choice) {
                 case "1":
-                    serverGame.findGame();
+                    serverGameCLI.findGame();
                     break;
 
                 case "2":
-                    serverGame.challengePlayer();
+                    serverGameCLI.challengePlayer();
                     break;
 
                 case "3":
-                    serverGame.handleIncomingChallenges();
+                    serverGameCLI.handleIncomingChallenges();
                     break;
 
                 case "4":
-                    serverGame.waitForTournamentMatch();
+                    serverGameCLI.waitForTournamentMatch();
                     break;
 
                 case "5":

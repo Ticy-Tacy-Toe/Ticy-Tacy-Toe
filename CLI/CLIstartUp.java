@@ -2,7 +2,7 @@ package TicyTacyToe.CLI;
 
 import java.util.Scanner;
 
-public class CLI {
+public class CLIstartUp {
 
     public static void intro(Scanner scanner) {
         System.out.println("Gday welcome to Ticy Tacy Toe!");

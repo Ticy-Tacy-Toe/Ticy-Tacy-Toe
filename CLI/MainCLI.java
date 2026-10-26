@@ -2,7 +2,7 @@
 package TicyTacyToe.CLI.MainCLI;
 
 import TicyTacyToe.Board;
-import TicyTacyToe.CLI.CLI;
+import TicyTacyToe.CLI.CLIstartUp;
 import TicyTacyToe.OfflineGameController;
 import TicyTacyToe.Server.ServerConnection;
 import TicyTacyToe.Server.ServerMenu;
@@ -21,8 +21,8 @@ public class MainCLI {
     public void start() {
         Board board = new Board();
 
-        CLI.intro(scanner);
-        boolean online = CLI.offORon();
+        CLIstartUp.intro(scanner);
+        boolean online = CLIstartUp.offORon();
 
         if (online) {
             startOnlineGame();
