@@ -18,6 +18,8 @@ public class GameSequence {
     public static final int MINMAX_AI = 2;
 
     private final int playerMode;
+    private final boolean tournamentMode;
+    private final Runnable tournamentExitHandler;
 
     private final ServerConnection connection;
     private final Board board;
@@ -38,7 +40,16 @@ public class GameSequence {
             Scanner scanner,
             String playerName
     ) {
-        this(connection, scanner, playerName, 0, null, HUMAN);
+        this(
+                connection,
+                scanner,
+                playerName,
+                0,
+                null,
+                HUMAN,
+                false,
+                null
+        );
     }
 
     public GameSequence(
@@ -54,7 +65,9 @@ public class GameSequence {
                 playerName,
                 waitTimeoutMillis,
                 timeoutMessage,
-                HUMAN
+                HUMAN,
+                false,
+                null
         );
     }
 
@@ -66,6 +79,49 @@ public class GameSequence {
             String timeoutMessage,
             int playerMode
     ) {
+        this(
+                connection,
+                scanner,
+                playerName,
+                waitTimeoutMillis,
+                timeoutMessage,
+                playerMode,
+                false,
+                null
+        );
+    }
+
+    public GameSequence(
+            ServerConnection connection,
+            Scanner scanner,
+            String playerName,
+            long waitTimeoutMillis,
+            String timeoutMessage,
+            int playerMode,
+            boolean tournamentMode
+    ) {
+        this(
+                connection,
+                scanner,
+                playerName,
+                waitTimeoutMillis,
+                timeoutMessage,
+                playerMode,
+                tournamentMode,
+                null
+        );
+    }
+
+    public GameSequence(
+            ServerConnection connection,
+            Scanner scanner,
+            String playerName,
+            long waitTimeoutMillis,
+            String timeoutMessage,
+            int playerMode,
+            boolean tournamentMode,
+            Runnable tournamentExitHandler
+    ) {
         this.connection = connection;
         this.scanner = scanner;
         this.playerName = playerName;
@@ -73,6 +129,8 @@ public class GameSequence {
         this.waitTimeoutMillis = waitTimeoutMillis;
         this.timeoutMessage = timeoutMessage;
         this.playerMode = playerMode;
+        this.tournamentMode = tournamentMode;
+        this.tournamentExitHandler = tournamentExitHandler;
     }
 
     public void start() throws IOException {
@@ -151,7 +209,7 @@ public class GameSequence {
                 System.out.println("You won!");
                 board.printboard();
 
-                if (returnToLobbyOrRematch()) {
+                if (continueAfterMatch()) {
                     continue;
                 }
 
@@ -162,7 +220,7 @@ public class GameSequence {
                 System.out.println("You lost!");
                 board.printboard();
 
-                if (returnToLobbyOrRematch()) {
+                if (continueAfterMatch()) {
                     continue;
                 }
 
@@ -173,11 +231,55 @@ public class GameSequence {
                 System.out.println("The game is a draw!");
                 board.printboard();
 
-                if (returnToLobbyOrRematch()) {
+                if (continueAfterMatch()) {
                     continue;
                 }
 
                 return;
+            }
+        }
+    }
+
+    private boolean continueAfterMatch() {
+        if (tournamentMode) {
+            return continueTournament();
+        }
+
+        return returnToLobbyOrRematch();
+    }
+
+    private boolean continueTournament() {
+        System.out.println("\n=== Tournament Match Finished ===");
+        System.out.println("1. Continue tournament");
+        System.out.println("2. Quit tournament mode");
+
+        while (true) {
+            System.out.print("Choose an option: ");
+            String choice = scanner.nextLine().trim();
+
+            if (choice.equals("1")) {
+                board.clearBoard();
+                waitStartedAt = System.currentTimeMillis();
+
+                System.out.println(
+                        "Waiting for your next tournament match..."
+                );
+
+                // Do not subscribe to ordinary matchmaking here.
+                // Continue listening for the next tournament match.
+                return true;
+
+            } else if (choice.equals("2")) {
+                System.out.println("Leaving tournament mode.");
+
+                if (tournamentExitHandler != null) {
+                    tournamentExitHandler.run();
+                }
+
+                return false;
+
+            } else {
+                System.out.println("Invalid option. Enter 1 or 2.");
             }
         }
     }

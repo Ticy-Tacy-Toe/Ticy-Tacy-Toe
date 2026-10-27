@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Scanner;
 
 public class OnlineGameController {
 
@@ -17,12 +16,14 @@ public class OnlineGameController {
     private static final long ACCEPT_TIMEOUT_MILLIS = 15_000;
 
     private final ServerConnection connection;
-    private final Scanner scanner;
+    private final java.util.Scanner scanner;
     private final String playerName;
     private final int playerMode;
     private final Consumer<String> notificationHandler;
 
     private final String gameType = "tic-tac-toe";
+
+    private volatile boolean tournamentMode;
 
     private final List<IncomingChallenge> pendingChallenges =
             new CopyOnWriteArrayList<>();
@@ -48,7 +49,7 @@ public class OnlineGameController {
 
     public OnlineGameController(
             ServerConnection connection,
-            Scanner scanner,
+            java.util.Scanner scanner,
             String playerName,
             int playerMode,
             Consumer<String> notificationHandler
@@ -145,6 +146,11 @@ public class OnlineGameController {
             return;
         }
 
+        // Do not accept or queue incoming challenges during a tournament.
+        if (tournamentMode) {
+            return;
+        }
+
         String challenger = extractValue(message, "CHALLENGER");
         String receivedGameType = extractValue(message, "GAMETYPE");
 
@@ -213,7 +219,9 @@ public class OnlineGameController {
                     playerName,
                     timeoutMillis,
                     timeoutMessage,
-                    playerMode
+                    playerMode,
+                    tournamentMode,
+                    () -> tournamentMode = false
             );
 
             gameSequence.start();
@@ -223,6 +231,15 @@ public class OnlineGameController {
                     "Error during the online game: " + e.getMessage()
             );
         }
+    }
+
+    public void waitForTournamentMatch() {
+        tournamentMode = true;
+        pendingChallenges.clear();
+
+        // The server should already know about tournament participation.
+        // Do not subscribe to ordinary matchmaking here.
+        waitForGame(0, null);
     }
 
     private String extractValue(String message, String key) {
@@ -238,9 +255,5 @@ public class OnlineGameController {
         }
 
         return null;
-    }
-
-    public void waitForTournamentMatch() {
-        waitForGame(0, null);
     }
 }
