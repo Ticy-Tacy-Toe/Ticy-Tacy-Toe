@@ -248,41 +248,20 @@ public class GameSequence {
         return returnToLobbyOrRematch();
     }
 
+
     private boolean continueTournament() {
         System.out.println("\n=== Tournament Match Finished ===");
-        System.out.println("1. Continue tournament");
-        System.out.println("2. Quit tournament mode");
 
-        while (true) {
-            System.out.print("Choose an option: ");
-            String choice = scanner.nextLine().trim();
+        board.clearBoard();
+        waitStartedAt = System.currentTimeMillis();
 
-            if (choice.equals("1")) {
-                board.clearBoard();
-                waitStartedAt = System.currentTimeMillis();
+        System.out.println(
+                "Waiting for your next tournament match..."
+        );
 
-                System.out.println(
-                        "Waiting for your next tournament match..."
-                );
-
-                // Do not subscribe to ordinary matchmaking here.
-                // Continue listening for the next tournament match.
-                return true;
-
-            } else if (choice.equals("2")) {
-                System.out.println("Leaving tournament mode.");
-
-                if (tournamentExitHandler != null) {
-                    tournamentExitHandler.run();
-                }
-
-                return false;
-
-            } else {
-                System.out.println("Invalid option. Enter 1 or 2.");
-            }
-        }
+        return true;
     }
+
 
     private String nextMessage() throws IOException {
         if (inMatch) {
