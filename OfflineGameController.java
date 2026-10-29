@@ -226,6 +226,6 @@ public class OfflineGameController {
     }
 
     private static int getStartingPlayer(Player firstPlayer, Player secondPlayer) {
-        return firstPlayer.getSymbol() == 'X' ? 1 : 2;
+        return firstPlayer.getSymbol() == 'X' ? 2 : 1;
     }
 }
