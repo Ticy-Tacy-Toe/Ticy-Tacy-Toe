@@ -19,7 +19,6 @@ public class GameSequence {
 
     private final int playerMode;
     private final boolean tournamentMode;
-    private final Runnable tournamentExitHandler;
 
     private final ServerConnection connection;
     private final Board board;
@@ -27,90 +26,13 @@ public class GameSequence {
     private final String playerName;
 
     private long waitTimeoutMillis;
-    private String timeoutMessage;
+    private final String timeoutMessage;
     private long waitStartedAt;
 
     private boolean inMatch;
 
     private char playerSymbol;
     private char opponentSymbol;
-
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                0,
-                null,
-                HUMAN,
-                false,
-                null
-        );
-    }
-
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName,
-            long waitTimeoutMillis,
-            String timeoutMessage
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                waitTimeoutMillis,
-                timeoutMessage,
-                HUMAN,
-                false,
-                null
-        );
-    }
-
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName,
-            long waitTimeoutMillis,
-            String timeoutMessage,
-            int playerMode
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                waitTimeoutMillis,
-                timeoutMessage,
-                playerMode,
-                false,
-                null
-        );
-    }
-
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName,
-            long waitTimeoutMillis,
-            String timeoutMessage,
-            int playerMode,
-            boolean tournamentMode
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                waitTimeoutMillis,
-                timeoutMessage,
-                playerMode,
-                tournamentMode,
-                null
-        );
-    }
 
     public GameSequence(
             ServerConnection connection,
@@ -130,7 +52,6 @@ public class GameSequence {
         this.timeoutMessage = timeoutMessage;
         this.playerMode = playerMode;
         this.tournamentMode = tournamentMode;
-        this.tournamentExitHandler = tournamentExitHandler;
     }
 
     public void start() throws IOException {
@@ -244,7 +165,6 @@ public class GameSequence {
         if (tournamentMode) {
             return continueTournament();
         }
-
         return returnToLobbyOrRematch();
     }
 
@@ -354,8 +274,6 @@ public class GameSequence {
 
         if (move == null
                 || move.length < 2
-                || move[0] < 0 || move[0] > 2
-                || move[1] < 0 || move[1] > 2
                 || !board.checkMove(move[0], move[1])) {
 
             System.out.println("AI could not find a valid move.");
