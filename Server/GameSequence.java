@@ -35,82 +35,7 @@ public class GameSequence {
     private char playerSymbol;
     private char opponentSymbol;
 
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                0,
-                null,
-                HUMAN,
-                false,
-                null
-        );
-    }
 
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName,
-            long waitTimeoutMillis,
-            String timeoutMessage
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                waitTimeoutMillis,
-                timeoutMessage,
-                HUMAN,
-                false,
-                null
-        );
-    }
-
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName,
-            long waitTimeoutMillis,
-            String timeoutMessage,
-            int playerMode
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                waitTimeoutMillis,
-                timeoutMessage,
-                playerMode,
-                false,
-                null
-        );
-    }
-
-    public GameSequence(
-            ServerConnection connection,
-            Scanner scanner,
-            String playerName,
-            long waitTimeoutMillis,
-            String timeoutMessage,
-            int playerMode,
-            boolean tournamentMode
-    ) {
-        this(
-                connection,
-                scanner,
-                playerName,
-                waitTimeoutMillis,
-                timeoutMessage,
-                playerMode,
-                tournamentMode,
-                null
-        );
-    }
 
     public GameSequence(
             ServerConnection connection,
@@ -370,7 +295,7 @@ public class GameSequence {
                         + ", column " + (move[1] + 1)
         );
 
-        connection.sendCommand("move " + position);
+        connection.sendCommand("choose " + position);
     }
 
     private void playHumanMove() {
@@ -418,7 +343,7 @@ public class GameSequence {
                 }
 
                 int position = row * 3 + column;
-                connection.sendCommand("move " + position);
+                connection.sendCommand("choose " + position);
                 return;
 
             } catch (NumberFormatException e) {
@@ -429,7 +354,7 @@ public class GameSequence {
 
     private void processMove(String message) {
         String player = extractValue(message, "PLAYER");
-        String serverMove = extractValue(message, "MOVE");
+        String serverMove = extractValue(message, "CHOOSE");
 
         if (player == null || serverMove == null) {
             System.out.println("Could not read the server's move.");
