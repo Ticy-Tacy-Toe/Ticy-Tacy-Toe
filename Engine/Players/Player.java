@@ -1,15 +1,14 @@
 package TicyTacyToe.Engine.Players;
 
 import TicyTacyToe.Board;
+
 public abstract class Player {
     private String name;
-    private char symbol;
     private int number;
     private int score;
 
-    public Player(String name, char symbol, int number) {
+    public Player(String name, int number) {
         this.name = name;
-        this.symbol = symbol;
         this.number = number;
         this.score = 0;
     }
@@ -18,10 +17,6 @@ public abstract class Player {
 
     public String getName() {
         return name;
-    }
-
-    public char getSymbol() {
-        return symbol;
     }
 
     public int getNumber() {
