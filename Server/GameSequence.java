@@ -1,9 +1,9 @@
 package TicyTacyToe.Server;
 
-import TicyTacyToe.Board;
 import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
-
+import TicyTacyToe.BoardTicyTacyToe;
+import TicyTacyToe.Engine.Board;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -69,7 +69,7 @@ public class GameSequence {
         this.connection = connection;
         this.scanner = scanner;
         this.playerName = playerName;
-        this.board = new Board();
+        this.board = new BoardTicyTacyToe();
         this.waitTimeoutMillis = waitTimeoutMillis;
         this.timeoutMessage = timeoutMessage;
         this.playerMode = playerMode;
@@ -138,7 +138,7 @@ public class GameSequence {
 
                 System.out.println("Match started!");
                 System.out.println("Your symbol: " + playerSymbol);
-                board.printboard();
+                board.printBoard();
 
             } else if (message.contains("SVR GAME YOURTURN")) {
                 playMove();
@@ -149,7 +149,7 @@ public class GameSequence {
             } else if (message.contains("SVR GAME WIN")) {
                 inMatch = false;
                 System.out.println("You won!");
-                board.printboard();
+                board.printBoard();
 
                 if (returnToLobbyOrRematch()) {
                     continue;
@@ -160,7 +160,7 @@ public class GameSequence {
             } else if (message.contains("SVR GAME LOSS")) {
                 inMatch = false;
                 System.out.println("You lost!");
-                board.printboard();
+                board.printBoard();
 
                 if (returnToLobbyOrRematch()) {
                     continue;
@@ -171,7 +171,7 @@ public class GameSequence {
             } else if (message.contains("SVR GAME DRAW")) {
                 inMatch = false;
                 System.out.println("The game is a draw!");
-                board.printboard();
+                board.printBoard();
 
                 if (returnToLobbyOrRematch()) {
                     continue;
@@ -293,7 +293,7 @@ public class GameSequence {
     }
 
     private void playHumanMove() {
-        board.printboard();
+        board.printBoard();
 
         while (true) {
             System.out.print(
@@ -374,7 +374,7 @@ public class GameSequence {
 
             if (board.checkMove(row, column)) {
                 board.doMove(new int[]{row, column}, symbol);
-                board.printboard();
+                board.printBoard();
             } else {
                 System.out.println(
                         "The server reported an occupied position. "

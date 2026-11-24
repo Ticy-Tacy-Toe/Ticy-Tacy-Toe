@@ -3,11 +3,11 @@ package TicyTacyToe;
 import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
 import TicyTacyToe.CLI.CLIstartUp;
+import TicyTacyToe.Engine.Board;
 import TicyTacyToe.Engine.Players.AIPlayer;
 import TicyTacyToe.Engine.Players.HumanPlayer;
 import TicyTacyToe.Engine.Players.Player;
 import TicyTacyToe.Move.*;
-
 import java.util.Scanner;
 
 public class OfflineGameController {
@@ -46,7 +46,7 @@ public class OfflineGameController {
                     scanner
             );
 
-            board.printboard();
+            board.printBoard();
 
             if (isGameOver(board)) {
                 gameOver = endingScreen(
@@ -60,7 +60,7 @@ public class OfflineGameController {
 
                 if (!gameOver) {
                     board.clearBoard();
-                    board.printboard();
+                    board.printBoard();
                     currentPlayer = getStartingPlayer(humanPlayer, secondPlayer);
                 }
             } else {
@@ -175,9 +175,7 @@ public class OfflineGameController {
     }
 
     private static boolean hasWon(Board board) {
-        return board.checkRow()
-                || board.checkColumn()
-                || board.checkDiagonal();
+        return board.checkWin();
     }
 
     public static boolean endingScreen(

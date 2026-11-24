@@ -1,12 +1,13 @@
 package TicyTacyToe;
 
+import TicyTacyToe.Engine.Board;
 import java.util.Objects;
 
-public class Board {
+public class BoardTicyTacyToe implements Board {
 
     private final String[][] board;
 
-    public Board() {
+    public BoardTicyTacyToe() {
         board = new String[][] {
                 { " ", " ", " " },
                 { " ", " ", " " },
@@ -14,7 +15,8 @@ public class Board {
         };
     }
 
-    public void printboard() {
+    @Override
+    public void printBoard() {
         for (String[] row : board) {
             for (String cell : row) {
                 System.out.print("[" + cell + "]");
@@ -23,6 +25,7 @@ public class Board {
         }
     }
 
+    @Override
     public String[][] clearBoard() {
         int n = board.length;
         for (int i = 0; i < n; i++) {
@@ -33,42 +36,46 @@ public class Board {
         return board;
     }
 
+    @Override
     public String[][] getBoard() {
         return board;
     }
 
-    public boolean checkRow() {
+    @Override
+    public boolean checkWin() {
+        return checkRow() || checkColumn() || checkDiagonal();
+    }
+
+    private boolean checkRow() {
         for (int i = 0; i < board.length; i++) {
-            // Ensure cell is not empty, then compare across all 3 columns
             if (!board[i][0].equals(" ") &&
                     board[i][0].equals(board[i][1]) &&
                     board[i][1].equals(board[i][2])) {
-                return true; // Return true as soon as ANY row wins
+                return true;
             }
         }
 
-        return false; // Return false ONLY after all rows have been checked
+        return false;
     }
 
-    public boolean checkColumn() {
+    private boolean checkColumn() {
         for (int i = 0; i < board.length; i++) {
-            // Ensure cell is not empty, then compare across all 3 columns
             if (!board[0][i].equals(" ") &&
                     board[0][i].equals(board[1][i]) &&
                     board[1][i].equals(board[2][i])) {
-                return true; // Return true as soon as ANY row wins
+                return true;
             }
         }
 
-        return false; // Return false ONLY after all rows have been checked
+        return false;
     }
 
-    public boolean checkDiagonal() {
+    private boolean checkDiagonal() {
         for (int i = 0; i < board.length; i++) {
             if (!board[i][i].equals(" ") &&
                     board[0][0].equals(board[1][1]) &&
                     board[1][1].equals(board[2][2])) {
-                return true; // Return true as soon as ANY row wins
+                return true;
             }
         }
         if (!board[0][2].equals(" ") &&
@@ -76,7 +83,7 @@ public class Board {
                 !board[2][0].equals(" ") &&
                 board[0][2].equals(board[1][1]) &&
                 board[1][1].equals(board[2][0])) {
-            return true; // Return true as soon as ANY row wins
+            return true;
         } else {
             return false;
         }
@@ -108,7 +115,6 @@ public class Board {
         }
     }
 
-//new line for commit
     public void doMove(int[] input, char playerSymbol){
         int row = input[0];
         int column = input[1];

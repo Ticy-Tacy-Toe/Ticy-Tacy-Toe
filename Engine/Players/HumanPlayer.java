@@ -1,13 +1,16 @@
 
 package TicyTacyToe.Engine.Players;
 
-import TicyTacyToe.Board;
+import TicyTacyToe.Engine.Board;
 import TicyTacyToe.Move.*;
+import java.util.Scanner;
 
 public class HumanPlayer extends Player {
-
+    private Scanner scanner;
+    
     public HumanPlayer(String name, int number) {
         super(name, number);
+
     }
 
     @Override

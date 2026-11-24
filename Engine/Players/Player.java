@@ -1,6 +1,6 @@
 package TicyTacyToe.Engine.Players;
 
-import TicyTacyToe.Board;
+import TicyTacyToe.Engine.Board;
 
 public abstract class Player {
     private String name;

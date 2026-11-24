@@ -1,9 +1,7 @@
+package TicyTacyToe.AI;
 
-        package TicyTacyToe.AI;
-
-import TicyTacyToe.Board;
+import TicyTacyToe.Engine.Board;
 import TicyTacyToe.Engine.Players.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 

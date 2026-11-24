@@ -1,7 +1,7 @@
 package TicyTacyToe.Engine.Players;
 
 import TicyTacyToe.AI.MinmaxAI;
-import TicyTacyToe.Board;
+import TicyTacyToe.Engine.Board;
 
 public class AIPlayer extends Player {
 

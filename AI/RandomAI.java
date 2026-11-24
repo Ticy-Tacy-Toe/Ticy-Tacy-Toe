@@ -1,12 +1,13 @@
 package TicyTacyToe.AI;
 
-import TicyTacyToe.Board;
+import TicyTacyToe.BoardTicyTacyToe;
+import TicyTacyToe.Engine.Board;
 import java.util.Arrays;
 
 public class RandomAI {
     public static void main(String[] args) {
 
-        Board board = new Board();
+        Board board = new BoardTicyTacyToe();
         
         System.out.println(Arrays.toString(aiChoice(board)));
     }

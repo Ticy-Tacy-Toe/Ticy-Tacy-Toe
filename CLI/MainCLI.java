@@ -1,13 +1,12 @@
 
 package TicyTacyToe.CLI;
 
-import TicyTacyToe.Board;
-import TicyTacyToe.CLI.CLIstartUp;
+import TicyTacyToe.BoardTicyTacyToe;
+import TicyTacyToe.Engine.Board;
 import TicyTacyToe.OfflineGameController;
+import TicyTacyToe.Server.GameSequence;
 import TicyTacyToe.Server.ServerConnection;
 import TicyTacyToe.Server.ServerMenu;
-import TicyTacyToe.Server.GameSequence;
-
 import java.util.Scanner;
 
 public class MainCLI {
@@ -19,7 +18,7 @@ public class MainCLI {
     }
 
     public void start() {
-        Board board = new Board();
+        Board board = new BoardTicyTacyToe();
 
         CLIstartUp.intro(scanner);
         boolean online = CLIstartUp.offORon();
@@ -28,7 +27,7 @@ public class MainCLI {
             startOnlineGame();
         } else {
             OfflineGameController.run(board, scanner);
-            board.printboard();
+            board.printBoard();
         }
     }
 
