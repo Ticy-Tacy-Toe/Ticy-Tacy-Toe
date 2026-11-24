@@ -2,7 +2,7 @@ package TicyTacyToe.Engine;
 
 public interface Board {
     void printBoard();
-    String[][] clearBoard();
+    void clearBoard();
     String[][] getBoard();
     boolean checkWin();
     boolean checkFull();

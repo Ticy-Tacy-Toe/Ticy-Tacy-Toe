@@ -26,14 +26,13 @@ public class BoardTicyTacyToe implements Board {
     }
 
     @Override
-    public String[][] clearBoard() {
+    public void clearBoard() {
         int n = board.length;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 board[i][j] = " ";
             }
         }
-        return board;
     }
 
     @Override
