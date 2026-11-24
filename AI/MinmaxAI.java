@@ -2,7 +2,7 @@
         package TicyTacyToe.AI;
 
 import TicyTacyToe.Board;
-import TicyTacyToe.Players.Player;
+import TicyTacyToe.Engine.Players.Player;
 
 import java.util.ArrayList;
 import java.util.List;

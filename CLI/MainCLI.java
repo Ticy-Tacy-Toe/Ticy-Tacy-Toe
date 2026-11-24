@@ -1,5 +1,5 @@
 
-package TicyTacyToe.CLI.MainCLI;
+package TicyTacyToe.CLI;
 
 import TicyTacyToe.Board;
 import TicyTacyToe.CLI.CLIstartUp;

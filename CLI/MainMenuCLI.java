@@ -1,6 +1,6 @@
-package TicyTacyToe.CLI.MainMenuCLI;
+package TicyTacyToe.CLI;
 
-import TicyTacyToe.CLI.ServerGameCLI.ServerGameCLI;
+import TicyTacyToe.CLI.ServerGameCLI;
 import TicyTacyToe.Server.OnlineGameController;
 import TicyTacyToe.Server.ServerConnection;
 

@@ -1,6 +1,6 @@
 package TicyTacyToe;
 
-import TicyTacyToe.CLI.MainCLI.MainCLI;
+import TicyTacyToe.CLI.MainCLI;
 
 public class Main {
 

@@ -3,10 +3,10 @@ package TicyTacyToe;
 import TicyTacyToe.AI.MinmaxAI;
 import TicyTacyToe.AI.RandomAI;
 import TicyTacyToe.CLI.CLIstartUp;
+import TicyTacyToe.Engine.Players.AIPlayer;
+import TicyTacyToe.Engine.Players.HumanPlayer;
+import TicyTacyToe.Engine.Players.Player;
 import TicyTacyToe.Move.*;
-import TicyTacyToe.Players.AIPlayer;
-import TicyTacyToe.Players.HumanPlayer;
-import TicyTacyToe.Players.Player;
 
 import java.util.Scanner;
 

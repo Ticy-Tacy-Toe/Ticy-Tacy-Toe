@@ -1,5 +1,5 @@
 
-package TicyTacyToe.Players;
+package TicyTacyToe.Engine.Players;
 
 import TicyTacyToe.Board;
 import TicyTacyToe.Move.*;

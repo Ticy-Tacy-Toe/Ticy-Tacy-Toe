@@ -1,4 +1,4 @@
-package TicyTacyToe.Players;
+package TicyTacyToe.Engine.Players;
 
 import TicyTacyToe.Board;
 public abstract class Player {

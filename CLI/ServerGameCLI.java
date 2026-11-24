@@ -1,5 +1,5 @@
 
-package TicyTacyToe.CLI.ServerGameCLI;
+package TicyTacyToe.CLI;
 
 import TicyTacyToe.Server.OnlineGameController;
 

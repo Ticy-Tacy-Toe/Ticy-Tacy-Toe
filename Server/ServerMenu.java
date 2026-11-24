@@ -1,7 +1,7 @@
 //minor change
 package TicyTacyToe.Server;
 
-import TicyTacyToe.CLI.MainMenuCLI.MainMenuCLI;
+import TicyTacyToe.CLI.MainMenuCLI;
 
 import java.util.Scanner;
 
