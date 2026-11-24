@@ -14,19 +14,11 @@ public class TicTacToeBoard implements Board {
 
     @Override
     public void printBoard() {
-        for (int row = 0; row < 3; row++) {
-            for (int column = 0; column < 3; column++) {
-                System.out.print(board[row][column]);
-
-                if (column < 2) {
-                    System.out.print(" | ");
-                }
+        for (String[] row : board) {
+            for (String cell : row) {
+                System.out.print("[" + cell + "]");
             }
             System.out.println();
-
-            if (row < 2) {
-                System.out.println("---------");
-            }
         }
     }
 
@@ -37,7 +29,6 @@ public class TicTacToeBoard implements Board {
                 board[row][column] = " ";
             }
         }
-
     }
 
     @Override
@@ -47,8 +38,10 @@ public class TicTacToeBoard implements Board {
 
     @Override
     public boolean checkWin() {
+        return hasRowWon() || hasColumnWon() || hasDiagonalWon();
+    }
 
-        // Check rows
+    private boolean hasRowWon() {
         for (int row = 0; row < 3; row++) {
             if (!board[row][0].equals(" ")
                     && board[row][0].equals(board[row][1])
@@ -57,7 +50,10 @@ public class TicTacToeBoard implements Board {
             }
         }
 
-        // Check columns
+        return false;
+    }
+
+    private boolean hasColumnWon() {
         for (int column = 0; column < 3; column++) {
             if (!board[0][column].equals(" ")
                     && board[0][column].equals(board[1][column])
@@ -66,13 +62,19 @@ public class TicTacToeBoard implements Board {
             }
         }
 
-        // Check diagonals
+        return false;
+    }
+
+    private boolean hasDiagonalWon() {
+
+        // Check top-left to bottom-right
         if (!board[0][0].equals(" ")
                 && board[0][0].equals(board[1][1])
                 && board[1][1].equals(board[2][2])) {
             return true;
         }
 
+        // Check top-right to bottom-left
         if (!board[0][2].equals(" ")
                 && board[0][2].equals(board[1][1])
                 && board[1][1].equals(board[2][0])) {
