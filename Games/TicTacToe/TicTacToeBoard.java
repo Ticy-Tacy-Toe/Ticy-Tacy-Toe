@@ -2,6 +2,7 @@
 package TicyTacyToe.Games.TicTacToe;
 
 import TicyTacyToe.Engine.Board;
+import TicyTacyToe.Engine.Move;
 
 public class TicTacToeBoard implements Board {
 
@@ -105,11 +106,11 @@ public class TicTacToeBoard implements Board {
 
         return board[row][column].equals(" ");
     }
-
     @Override
-    public void doMove(int[] input, char playerSymbol) {
-        int row = input[0];
-        int column = input[1];
+    public void doMove(Move move, char playerSymbol) {
+
+        int row = move.getRow();
+        int column = move.getColumn();
 
         if (checkMove(row, column)) {
             board[row][column] = String.valueOf(playerSymbol);

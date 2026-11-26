@@ -3,6 +3,7 @@ package TicyTacyToe.Games.TicTacToe;
 import TicyTacyToe.Engine.Board;
 import TicyTacyToe.Engine.Game;
 import TicyTacyToe.Engine.GameState;
+import TicyTacyToe.Engine.Move;
 import TicyTacyToe.Engine.Players.Player;
 
 public class TicTacToeGame implements Game {
@@ -24,13 +25,13 @@ public class TicTacToeGame implements Game {
     }
 
     @Override
-    public boolean makeMove(int[] move) {
+    public boolean makeMove(Move move) {
 
         if (state != GameState.PLAYING) {
             return false;
         }
 
-        if (!board.checkMove(move[0], move[1])) {
+        if (!board.checkMove(move.getRow(), move.getColumn())) {
             return false;
         }
 
@@ -64,6 +65,7 @@ public class TicTacToeGame implements Game {
 
         return true;
     }
+
 
     private void switchPlayer() {
         if (currentPlayer == player1) {

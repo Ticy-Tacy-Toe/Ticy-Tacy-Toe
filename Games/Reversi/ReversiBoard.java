@@ -1,6 +1,7 @@
 package TicyTacyToe.Games.Reversi;
 
 import TicyTacyToe.Engine.Board;
+import TicyTacyToe.Engine.Move;
 
 public class ReversiBoard implements Board{
 
@@ -35,7 +36,7 @@ public class ReversiBoard implements Board{
     }
 
     @Override
-    public void doMove(int[] input, char playerSymbol) {
+    public void doMove(Move move, char playerSymbol) {
 
     }
 }

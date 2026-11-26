@@ -7,5 +7,5 @@ public interface Board {
     boolean checkWin();
     boolean checkFull();
     boolean checkMove(int row, int column);
-    void doMove(int[] input, char playerSymbol);
+    void doMove(Move move, char playerSymbol);
 }

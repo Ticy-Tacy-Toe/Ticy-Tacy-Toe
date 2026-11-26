@@ -2,7 +2,7 @@ package TicyTacyToe.Engine;
 
 public class GameEngine {
 
-    private Game game;
+    private final Game game;
 
     public GameEngine(Game game) {
         this.game = game;

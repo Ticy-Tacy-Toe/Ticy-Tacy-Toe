@@ -3,11 +3,12 @@ package TicyTacyToe.Games.Reversi;
 import TicyTacyToe.Engine.Board;
 import TicyTacyToe.Engine.Game;
 import TicyTacyToe.Engine.GameState;
+import TicyTacyToe.Engine.Move;
 import TicyTacyToe.Engine.Players.Player;
 
 public class ReversiGame implements Game {
     @Override
-    public boolean makeMove(int[] move) {
+    public boolean makeMove(Move move) {
         return false;
     }
 
