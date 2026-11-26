@@ -1,6 +1,8 @@
 package TicyTacyToe;
 
 import TicyTacyToe.Engine.Board;
+import TicyTacyToe.Engine.Move;
+
 import java.util.Objects;
 
 public class BoardTicyTacyToe implements Board {
@@ -28,6 +30,7 @@ public class BoardTicyTacyToe implements Board {
     @Override
     public void clearBoard() {
         int n = board.length;
+
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 board[i][j] = " ";
@@ -47,9 +50,9 @@ public class BoardTicyTacyToe implements Board {
 
     private boolean checkRow() {
         for (int i = 0; i < board.length; i++) {
-            if (!board[i][0].equals(" ") &&
-                    board[i][0].equals(board[i][1]) &&
-                    board[i][1].equals(board[i][2])) {
+            if (!board[i][0].equals(" ")
+                    && board[i][0].equals(board[i][1])
+                    && board[i][1].equals(board[i][2])) {
                 return true;
             }
         }
@@ -59,9 +62,9 @@ public class BoardTicyTacyToe implements Board {
 
     private boolean checkColumn() {
         for (int i = 0; i < board.length; i++) {
-            if (!board[0][i].equals(" ") &&
-                    board[0][i].equals(board[1][i]) &&
-                    board[1][i].equals(board[2][i])) {
+            if (!board[0][i].equals(" ")
+                    && board[0][i].equals(board[1][i])
+                    && board[1][i].equals(board[2][i])) {
                 return true;
             }
         }
@@ -71,42 +74,46 @@ public class BoardTicyTacyToe implements Board {
 
     private boolean checkDiagonal() {
         for (int i = 0; i < board.length; i++) {
-            if (!board[i][i].equals(" ") &&
-                    board[0][0].equals(board[1][1]) &&
-                    board[1][1].equals(board[2][2])) {
+            if (!board[i][i].equals(" ")
+                    && board[0][0].equals(board[1][1])
+                    && board[1][1].equals(board[2][2])) {
                 return true;
             }
         }
-        if (!board[0][2].equals(" ") &&
-                !board[1][1].equals(" ") &&
-                !board[2][0].equals(" ") &&
-                board[0][2].equals(board[1][1]) &&
-                board[1][1].equals(board[2][0])) {
+
+        if (!board[0][2].equals(" ")
+                && !board[1][1].equals(" ")
+                && !board[2][0].equals(" ")
+                && board[0][2].equals(board[1][1])
+                && board[1][1].equals(board[2][0])) {
             return true;
         } else {
             return false;
         }
     }
 
+    @Override
     public boolean checkFull() {
         int full = 0;
         int n = board.length;
+
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (!board[i][j].equals(" ")) {
                     full++;
                 }
-
             }
         }
+
         if (full == n * n) {
             return true;
         } else {
             return false;
         }
-
     }
-  public boolean checkMove(int row, int column) {
+
+    @Override
+    public boolean checkMove(int row, int column) {
         if (row >= 0 && row <= 2 && column >= 0 && column <= 2) {
             return Objects.equals(board[row][column], " ");
         } else {
@@ -114,9 +121,12 @@ public class BoardTicyTacyToe implements Board {
         }
     }
 
-    public void doMove(int[] input, char playerSymbol){
-        int row = input[0];
-        int column = input[1];
+    @Override
+    public void doMove(Move move, char playerSymbol) {
+
+        int row = move.getRow();
+        int column = move.getColumn();
+
         if (checkMove(row, column)) {
             board[row][column] = String.valueOf(playerSymbol);
         }

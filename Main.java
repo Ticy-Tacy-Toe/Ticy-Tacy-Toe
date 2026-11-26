@@ -1,11 +1,12 @@
 package TicyTacyToe;
 
-import TicyTacyToe.CLI.MainCLI;
+import TicyTacyToe.CLI.TicTacToeCLI;
 
 public class Main {
 
     public static void main(String[] args) {
-        MainCLI mainCLI = new MainCLI();
-        mainCLI.start();
+
+        TicTacToeCLI cli = new TicTacToeCLI();
+        cli.start();
     }
 }
